@@ -8,6 +8,8 @@
   var isMiniApp = /tgWebApp/.test(location.hash + location.search);
 
   var $ = function (id) { return document.getElementById(id); };
+  // Лёгкая копия фото для ленты и размытое превью (создаёт tools/make-thumbs.py)
+  var thumb = function (src) { return (window.THUMBS || {})[src] || null; };
   var esc = function (s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
@@ -74,7 +76,7 @@
       box.style.aspectRatio = av.naturalWidth + " / " + av.naturalHeight;
       box.appendChild(av);
     };
-    av.src = S.avatar;
+    av.src = (thumb(S.avatar) || {}).s || S.avatar;
   }
   $("stats").hidden = !(S.stats || []).length;
   $("stats").innerHTML = (S.stats || []).map(function (s) {
@@ -124,7 +126,7 @@
   function media(m, wi, inLightbox, alt) {
     if (m.video) {
       // В ленте лёгкая mp4-копия, оригинал (.mov) только при открытии на весь экран
-      var srcs = !inLightbox && m.fallback
+      var srcs = m.fallback
         ? '<source src="' + esc(m.fallback) + '" type="video/mp4">'
         : m.fallback
         ? '<source src="' + esc(m.video) + '"' + (/\.mov$/i.test(m.video) ? ' type="video/quicktime"' : "") + '>' +
@@ -134,14 +136,29 @@
         return "<video" + (m.poster ? ' poster="' + esc(m.poster) + '"' : "") +
           ' muted loop playsinline autoplay preload="auto" controls>' + srcs + "</video>";
       }
-      // В сетке обложка видна сразу картинкой, а видео проявляется поверх, когда реально заиграло
-      return (m.poster ? '<img class="vposter" src="' + esc(m.poster) + '" alt="" loading="lazy">' : "") +
-        '<video muted loop playsinline preload="none" data-auto>' + srcs + "</video>";
+      // В ленте только обложка с кнопкой ▶: само видео грузится по нажатию
+      return (m.poster ? lightImg(m.poster, "") : "") +
+        '<span class="play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6.5v11l9-5.5z"/></svg></span>';
     }
     if (m.src) {
-      return '<img src="' + esc(m.src) + '" alt="' + esc(alt || "") + '"' + (inLightbox ? "" : ' loading="lazy"') + ' data-ph="' + wi + '">';
+      if (inLightbox) return '<img src="' + esc(m.src) + '" alt="' + esc(alt || "") + '" data-ph="' + wi + '">';
+      return lightImg(m.src, alt, wi);
     }
     return placeholder(wi, works[wi]);
+  }
+
+  // Фото в ленте: лёгкая копия; если её нет или она не открылась, берём оригинал
+  var eagerLeft = 0; // при открытии работ не видно, поэтому все фото грузятся по мере прокрутки
+  function lightImg(src, alt, wi) {
+    var t = thumb(src);
+    var lazy = eagerLeft-- > 0 ? ' fetchpriority="high"' : ' loading="lazy"';
+    return '<img src="' + esc(t ? t.s : src) + '" data-full="' + esc(src) + '" alt="' + esc(alt || "") + '"' +
+      lazy + ' decoding="async"' + (wi != null ? ' data-ph="' + wi + '"' : "") + ">";
+  }
+  // Размытое превью под кадром видно сразу, ещё до загрузки фото
+  function blurBg(m) {
+    var t = thumb(m.src || m.poster);
+    return t ? "background-image:url(" + t.q + ");" : "";
   }
 
   function renderGallery() {
@@ -172,7 +189,7 @@
         var n = slides.push({ w: w, m: m, wi: x.i }) - 1;
         return '<button class="look-item' + (m.video ? " is-video" : "") + '" type="button" data-slide="' + n + '"' +
           ' data-cap="' + esc(m.caption || w.title || "") + '" data-note="' + esc(m.note || w.note || "") + '"' +
-          (m.ratio ? ' style="aspect-ratio:' + esc(m.ratio) + ";--r:" + ratioNum(m.ratio) + '"' : "") + ">" +
+          ' style="' + blurBg(m) + (m.ratio ? "aspect-ratio:" + esc(m.ratio) + ";--r:" + ratioNum(m.ratio) : "") + '">' +
           media(m, x.i, false, m.caption || w.title) + (m.video ? badge(m) : "") + "</button>";
       }).join("");
       var multi = items.length > 1;
@@ -272,7 +289,15 @@
 
   // Если файла ещё нет, ставим заглушку
   function attachFallbacks(root) {
-    Array.prototype.forEach.call(root.querySelectorAll("img[data-ph]"), function (img) {
+    Array.prototype.forEach.call(root.querySelectorAll("img[data-full]"), function (img) {
+      var shown = function () { img.classList.add("ld"); };
+      if (img.complete && img.naturalWidth) shown(); else img.addEventListener("load", shown);
+      img.addEventListener("error", function () {
+        var full = img.getAttribute("data-full");
+        if (full && img.getAttribute("src") !== full) img.setAttribute("src", full);
+      });
+    });
+    Array.prototype.forEach.call(root.querySelectorAll("img[data-ph]:not([data-full])"), function (img) {
       var swap = function () {
         var i = +img.getAttribute("data-ph");
         var tmp = document.createElement("div");

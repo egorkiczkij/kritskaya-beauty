@@ -264,9 +264,18 @@ a.chip { text-decoration: none; }
   transition: clip-path 1.5s var(--ease) .25s, opacity 1.2s ease .25s, transform 1.4s var(--ease) .25s;
 }
 .look-item img, .look-item video { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 1.8s var(--ease) .25s; }
-.look-item .vposter, .look-item video { position: absolute; inset: 0; }
-.look-item video { opacity: 0; transition: opacity .6s ease; }
-.look-item video.is-playing { opacity: 1; }
+/* Размытое превью фоном, чёткое фото проявляется поверх, когда загрузилось */
+.look-item { background-size: cover; background-position: center; }
+.look-item img[data-full] { opacity: 0; transition: opacity .7s ease, transform 1.8s var(--ease) .25s; }
+.look-item img[data-full].ld { opacity: 1; }
+.look-item .play {
+  position: absolute; left: 50%; top: 50%; z-index: 1; transform: translate(-50%, -50%);
+  width: 58px; height: 58px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: rgba(255, 251, 247, .88); color: var(--ink);
+  box-shadow: 0 10px 30px -10px rgba(43, 33, 29, .5);
+}
+.look-item .play svg { width: 22px; height: 22px; margin-left: 3px; fill: currentColor; stroke: none; }
 .look-item video { pointer-events: none; }
 .look-item:active img, .look-item:active video { transform: scale(.985); }
 
