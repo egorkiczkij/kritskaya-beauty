@@ -66,6 +66,7 @@
   if (S.avatar) {
     var av = new Image();
     av.alt = S.name || "";
+    av.fetchPriority = "high";
     av.onload = function () {
       var box = $("avatar");
       box.textContent = "";
@@ -121,7 +122,10 @@
   // Видео: оригинал (например .mov с iPhone) и запасной mp4 для телефонов, которые оригинал не играют
   function media(m, wi, inLightbox, alt) {
     if (m.video) {
-      var srcs = m.fallback
+      // В ленте лёгкая mp4-копия, оригинал (.mov) только при открытии на весь экран
+      var srcs = !inLightbox && m.fallback
+        ? '<source src="' + esc(m.fallback) + '" type="video/mp4">'
+        : m.fallback
         ? '<source src="' + esc(m.video) + '"' + (/\.mov$/i.test(m.video) ? ' type="video/quicktime"' : "") + '>' +
           '<source src="' + esc(m.fallback) + '" type="video/mp4">'
         : '<source src="' + esc(m.video) + '" type="video/mp4">';
@@ -230,25 +234,25 @@
     es.forEach(function (e) {
       var v = e.target;
       v.dataset.inView = e.isIntersecting ? "1" : "0";
-      if (e.isIntersecting) tryPlay(v);
+      if (e.isIntersecting) { if (pageReady) tryPlay(v); }
       else v.pause();
     });
   }, { threshold: 0.25 }) : null;
-  // Загрузку видео начинаем примерно за экран до того, как до него долистают
-  var pio = "IntersectionObserver" in window ? new IntersectionObserver(function (es) {
-    es.forEach(function (e) {
-      if (!e.isIntersecting) return;
-      e.target.preload = "auto";
-      pio.unobserve(e.target);
+  // Видео грузим только после того, как загрузилась страница с фотографиями,
+  // и только то, что сейчас на экране: иначе видео забирают интернет у фото
+  var pageReady = document.readyState === "complete";
+  window.addEventListener("load", function () {
+    pageReady = true;
+    Array.prototype.forEach.call(document.querySelectorAll("video[data-auto]"), function (v) {
+      if (v.dataset.inView === "1") tryPlay(v);
     });
-  }, { rootMargin: "100% 0px 100% 0px" }) : null;
+  });
   function autoplay(root) {
     Array.prototype.forEach.call(root.querySelectorAll("video[data-auto]"), function (v) {
       v.muted = true; // iPhone запускает сам только беззвучное видео
       v.addEventListener("playing", function () { v.classList.add("is-playing"); });
       // если видео догрузилось, пока было на экране, запускаем ещё раз
       v.addEventListener("canplay", function () { if (v.dataset.inView === "1" && v.paused) tryPlay(v); });
-      if (pio) pio.observe(v);
       if (vio) vio.observe(v); else { v.autoplay = true; tryPlay(v); }
     });
   }
