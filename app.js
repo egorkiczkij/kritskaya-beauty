@@ -165,14 +165,13 @@
   function renderGallery() {
     slides = [];
     var all = works.map(function (w, i) { return { w: w, i: i }; });
-    $("works-count").textContent = all.length ? all.length + " " + plural(all.length, ["работа", "работы", "работ"]) : "";
+
     // Отдельный раздел на каждую категорию, в порядке списка categories
     $("gallery").innerHTML = (S.categories || []).map(function (c) {
       var shown = all.filter(function (x) { return x.w.category === c.id; });
       if (!shown.length) return "";
       return '<div class="gal-group" id="works-' + esc(c.id) + '">' +
-        '<div class="gal-head" data-reveal><h3>' + esc(c.title) + "</h3><span>" +
-        shown.length + " " + plural(shown.length, ["работа", "работы", "работ"]) + "</span></div>" +
+        '<div class="gal-head" data-reveal><h3>' + esc(c.title) + "</h3></div>" +
         '<div class="gal-grid">' + renderGroup(shown) + "</div></div>";
     }).join("");
     attachFallbacks($("gallery"));
@@ -216,7 +215,7 @@
         '<div class="look-media">' + frames + "</div>" +
         (multi ? '<div class="look-dots">' + items.map(function (m, k) {
           return '<span class="' + (k ? "" : "on") + '"></span>';
-        }).join("") + '<em>' + items.length + " " + plural(items.length, ["кадр", "кадра", "кадров"]) + "</em></div>" : "") +
+        }).join("") + "</div>" : "") +
         "</article>";
     }).join("");
   }
