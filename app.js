@@ -167,7 +167,9 @@
         var n = slides.push({ w: w, m: m, wi: x.i }) - 1;
         return '<button class="look-item' + (m.video ? " is-video" : "") + '" type="button" data-slide="' + n + '"' +
           (m.ratio ? ' style="aspect-ratio:' + esc(m.ratio) + '"' : "") + ">" +
-          media(m, x.i, false, w.title) + (m.video ? badge(m) : "") + "</button>";
+          media(m, x.i, false, m.caption || w.title) + (m.video ? badge(m) : "") +
+          (m.caption ? '<span class="frame-cap">' + esc(m.caption) + (m.note ? "<small>" + esc(m.note) + "</small>" : "") + "</span>" : "") +
+          "</button>";
       }).join("");
       var multi = items.length > 1;
       return '<article class="look' + (multi ? " look-multi" : "") + '" data-reveal>' +
@@ -255,7 +257,7 @@
     }
     attachFallbacks(stage);
     var items = itemsOf(x.w);
-    $("lb-title").textContent = x.w.title || catTitle(x.w.category);
+    $("lb-title").textContent = x.m.caption || x.w.title || catTitle(x.w.category);
     $("lb-counter").textContent = items.length > 1
       ? (items.indexOf(x.m) + 1) + " из " + items.length + " в образе"
       : (pos + 1) + " из " + slides.length;
@@ -292,9 +294,10 @@
   });
   $("lb-close").addEventListener("click", closeLightbox);
   $("lb-book").addEventListener("click", function () {
-    var w = slides[lbPos] && slides[lbPos].w;
-    book(w ? "Здравствуйте! Понравилась ваша работа «" + (w.title || catTitle(w.category)) +
-      "», хочу похожий образ. Подскажите, пожалуйста, свободные даты." : null, w && w.title);
+    var sl = slides[lbPos], w = sl && sl.w;
+    var name = sl ? (sl.m.caption || w.title || catTitle(w.category)) : "";
+    book(w ? "Здравствуйте! Понравилась ваша работа «" + name +
+      "», хочу похожий образ. Подскажите, пожалуйста, свободные даты." : null, name);
   });
   (function swipe() {
     var sx = 0, sy = 0;

@@ -268,6 +268,14 @@ em { font-style: italic; font-weight: 400; color: var(--accent-deep); }
 }
 .look-multi .look-media::-webkit-scrollbar { display: none; }
 .look-multi .look-item { flex: none; width: auto; height: min(66vh, 520px); max-width: 84%; scroll-snap-align: center; }
+/* Подпись отдельного кадра внутри блока */
+.frame-cap {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 1;
+  display: grid; gap: 4px; padding: 48px 14px 14px; text-align: left;
+  font-family: var(--serif); font-size: 19px; line-height: 1.15; color: #fff;
+  background: linear-gradient(transparent, rgba(35, 24, 19, .7));
+}
+.frame-cap small { font-family: var(--sans); font-size: 12px; line-height: 1.4; opacity: .85; }
 .look-dots { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 14px; }
 .look-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--line); transition: width .4s var(--ease), background .4s; }
 .look-dots span.on { width: 22px; border-radius: 3px; background: var(--accent); }
