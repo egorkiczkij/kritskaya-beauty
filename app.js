@@ -2,9 +2,10 @@
   "use strict";
 
   var S = window.SITE || {};
-  var tg = window.Telegram && window.Telegram.WebApp;
-  // В Instagram и обычном браузере скрипт Telegram тоже грузится, но platform = "unknown"
-  var inTg = !!(tg && tg.platform && tg.platform !== "unknown");
+  // Скрипт Telegram нужен, только когда сайт открыт как приложение внутри Telegram.
+  // Telegram передаёт это в адресе (tgWebAppData). В Instagram и браузере скрипт не грузим вовсе.
+  var tg = null, inTg = false;
+  var isMiniApp = /tgWebApp/.test(location.hash + location.search);
 
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (s) {
@@ -555,7 +556,10 @@
   onScroll();
 
   // ---------- Telegram ----------
-  if (inTg) {
+  function initTelegram() {
+    tg = window.Telegram && window.Telegram.WebApp;
+    inTg = !!(tg && tg.platform && tg.platform !== "unknown");
+    if (!inTg) return;
     document.body.classList.add("in-tg");
     try {
       tg.ready();
@@ -569,6 +573,13 @@
     } catch (e) {}
     tg.MainButton.onClick(function () { book(); });
     tg.BackButton.onClick(closeLightbox);
+    updateCta();
+  }
+  if (isMiniApp) {
+    var tgs = document.createElement("script");
+    tgs.src = "https://telegram.org/js/telegram-web-app.js";
+    tgs.onload = initTelegram;
+    document.head.appendChild(tgs);
   }
 
   reveal(document);
