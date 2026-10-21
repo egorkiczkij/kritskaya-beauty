@@ -97,9 +97,12 @@
   }
 
   // ---------- Портфолио ----------
+  // Работа бывает одиночной (src или video) или блоком образа (media: [...] + note)
   var works = S.works || [];
   var filter = "all";
-  var visible = [];
+  var slides = []; // все кадры видимых работ подряд, для листания в просмотре
+
+  var itemsOf = function (w) { return w.media && w.media.length ? w.media : [w]; };
 
   function renderFilters() {
     // Показываем только разделы, где уже есть работы
@@ -113,33 +116,69 @@
     }).join("");
   }
 
-  var badge = function (w) {
-    return '<span class="tile-badge"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10-6.5z"/></svg>' + esc(w.badge || "видео") + "</span>";
+  var badge = function (m) {
+    return '<span class="tile-badge"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10-6.5z"/></svg>' + esc(m.badge || "видео") + "</span>";
   };
-  function media(w, i, inLightbox) {
-    if (w.video) {
-      return '<video src="' + esc(w.video) + '"' + (w.poster ? ' poster="' + esc(w.poster) + '"' : "") +
-        ' muted loop playsinline autoplay preload="' + (inLightbox ? "auto" : "metadata") + '"' +
-        (inLightbox ? " controls" : "") + "></video>";
+  // Видео: оригинал (например .mov с iPhone) и запасной mp4 для телефонов, которые оригинал не играют
+  function media(m, wi, inLightbox, alt) {
+    if (m.video) {
+      var srcs = m.fallback
+        ? '<source src="' + esc(m.video) + '"' + (/\.mov$/i.test(m.video) ? ' type="video/quicktime"' : "") + '>' +
+          '<source src="' + esc(m.fallback) + '" type="video/mp4">'
+        : '<source src="' + esc(m.video) + '" type="video/mp4">';
+      return "<video" + (m.poster ? ' poster="' + esc(m.poster) + '"' : "") +
+        " muted loop playsinline" + (inLightbox ? ' autoplay preload="auto" controls' : ' preload="none" data-auto') + ">" +
+        srcs + "</video>";
     }
-    if (w.src) {
-      return '<img src="' + esc(w.src) + '" alt="' + esc(w.title) + '"' + (inLightbox ? "" : ' loading="lazy"') + ' data-ph="' + i + '">';
+    if (m.src) {
+      return '<img src="' + esc(m.src) + '" alt="' + esc(alt || "") + '"' + (inLightbox ? "" : ' loading="lazy"') + ' data-ph="' + wi + '">';
     }
-    return placeholder(i, w);
+    return placeholder(wi, works[wi]);
   }
 
   function renderGallery() {
-    visible = works.map(function (w, i) { return { w: w, i: i }; })
+    slides = [];
+    var shown = works.map(function (w, i) { return { w: w, i: i }; })
       .filter(function (x) { return filter === "all" || x.w.category === filter; });
-    $("works-count").textContent = visible.length ? visible.length + " " + plural(visible.length, ["работа", "работы", "работ"]) : "";
-    $("gallery").innerHTML = visible.map(function (x, pos) {
-      var w = x.w;
-      var inner = media(w, x.i, false) + (w.video ? badge(w) : "");
-      return '<button class="tile" type="button" data-reveal data-pos="' + pos + '" style="--d:' + (pos % 2) * 120 + 'ms">' +
-        inner + (w.title ? '<span class="tile-caption">' + esc(w.title) + "</span>" : "") + "</button>";
+    $("works-count").textContent = shown.length ? shown.length + " " + plural(shown.length, ["работа", "работы", "работ"]) : "";
+    var single = 0;
+    $("gallery").innerHTML = shown.map(function (x) {
+      var w = x.w, items = itemsOf(w);
+      if (items.length === 1) {
+        var n = slides.push({ w: w, m: items[0], wi: x.i }) - 1;
+        var d = (single++ % 2) * 120;
+        return '<button class="tile" type="button" data-reveal data-slide="' + n + '" style="--d:' + d + 'ms">' +
+          media(items[0], x.i, false, w.title) + (items[0].video ? badge(items[0]) : "") +
+          (w.title ? '<span class="tile-caption">' + esc(w.title) + "</span>" : "") + "</button>";
+      }
+      single = 0;
+      return '<article class="look look-n' + Math.min(items.length, 3) + '" data-reveal>' +
+        '<div class="look-head"><p class="eyebrow">' + esc(catTitle(w.category)) + "</p>" +
+        "<h3>" + esc(w.title) + "</h3>" +
+        (w.note ? '<p class="look-note">' + esc(w.note) + "</p>" : "") + "</div>" +
+        '<div class="look-media">' + items.map(function (m) {
+          var n = slides.push({ w: w, m: m, wi: x.i }) - 1;
+          return '<button class="look-item" type="button" data-slide="' + n + '">' +
+            media(m, x.i, false, w.title) + (m.video ? badge(m) : "") + "</button>";
+        }).join("") + "</div></article>";
     }).join("");
     attachFallbacks($("gallery"));
     reveal($("gallery"));
+    autoplay($("gallery"));
+  }
+
+  // Видео в сетке играют без звука, только пока видны на экране: так не тратится мобильный трафик
+  var vio = "IntersectionObserver" in window ? new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      var v = e.target;
+      if (e.isIntersecting) { var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); }
+      else v.pause();
+    });
+  }, { threshold: 0.25 }) : null;
+  function autoplay(root) {
+    Array.prototype.forEach.call(root.querySelectorAll("video[data-auto]"), function (v) {
+      if (vio) vio.observe(v); else { v.autoplay = true; v.play(); }
+    });
   }
 
   // Если файла ещё нет, ставим заглушку
@@ -172,14 +211,14 @@
     renderGallery();
   });
 
-  // ---------- Просмотр фото ----------
+  // ---------- Просмотр фото и видео ----------
   var lbPos = -1;
   function openLightbox(pos) {
     lbPos = pos;
-    var x = visible[pos];
+    var x = slides[pos];
     if (!x) return;
     var stage = $("lb-stage");
-    stage.innerHTML = media(x.w, x.i, true);
+    stage.innerHTML = media(x.m, x.wi, true, x.w.title);
     // Открыли по нажатию, поэтому пробуем со звуком; если браузер запретит, играем без звука
     var v = stage.querySelector("video");
     if (v) {
@@ -188,8 +227,11 @@
       if (pr && pr.catch) pr.catch(function () { v.muted = true; v.play(); });
     }
     attachFallbacks(stage);
+    var items = itemsOf(x.w);
     $("lb-title").textContent = x.w.title || catTitle(x.w.category);
-    $("lb-counter").textContent = (pos + 1) + " из " + visible.length;
+    $("lb-counter").textContent = items.length > 1
+      ? (items.indexOf(x.m) + 1) + " из " + items.length + " в образе"
+      : (pos + 1) + " из " + slides.length;
     if ($("lightbox").hidden) {
       $("lightbox").hidden = false;
       document.body.style.overflow = "hidden";
@@ -210,20 +252,20 @@
     }
   }
   function stepLightbox(d) {
-    if (!visible.length) return;
+    if (!slides.length) return;
     haptic("select");
-    openLightbox((lbPos + d + visible.length) % visible.length);
+    openLightbox((lbPos + d + slides.length) % slides.length);
   }
 
   $("gallery").addEventListener("click", function (e) {
-    var t = e.target.closest(".tile");
+    var t = e.target.closest("[data-slide]");
     if (!t) return;
     haptic("light");
-    openLightbox(+t.getAttribute("data-pos"));
+    openLightbox(+t.getAttribute("data-slide"));
   });
   $("lb-close").addEventListener("click", closeLightbox);
   $("lb-book").addEventListener("click", function () {
-    var w = visible[lbPos] && visible[lbPos].w;
+    var w = slides[lbPos] && slides[lbPos].w;
     book(w ? "Здравствуйте! Понравилась ваша работа «" + (w.title || catTitle(w.category)) +
       "», хочу похожий образ. Подскажите, пожалуйста, свободные даты." : null, w && w.title);
   });

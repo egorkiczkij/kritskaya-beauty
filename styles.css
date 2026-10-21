@@ -221,6 +221,36 @@ em { font-style: italic; font-weight: 400; color: var(--accent-deep); }
 .reveal-on .tile[data-reveal] img, .reveal-on .tile[data-reveal] video { transform: scale(1.12); }
 .reveal-on .tile[data-reveal].is-in img, .reveal-on .tile[data-reveal].is-in video { transform: none; }
 .tile:active img, .tile:active video { transform: scale(.98); }
+
+/* Блок образа: на всю ширину, подпись и кадры одного образа в ряд */
+.look {
+  column-span: all; break-inside: avoid;
+  margin: 18px 0 28px; padding: 22px 0 0;
+  border-top: 1px solid var(--line);
+}
+.look-head { display: grid; gap: 6px; margin-bottom: 14px; }
+.look-head h3 { margin: 0; font-family: var(--serif); font-weight: 400; font-size: 32px; line-height: 1.05; text-wrap: balance; }
+.look-note { margin: 0; max-width: 40ch; font-family: var(--serif); font-style: italic; font-size: 19px; line-height: 1.35; color: var(--ink-soft); }
+.look-media { display: flex; gap: 10px; }
+.look-n3 .look-media {
+  overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+  margin: 0 -16px; padding: 0 16px; scroll-padding: 0 16px;
+}
+.look-n3 .look-media::-webkit-scrollbar { display: none; }
+.look-item {
+  position: relative; flex: 1 1 0; min-width: 0;
+  aspect-ratio: 3 / 4; border-radius: 16px; overflow: hidden;
+  background: var(--accent-soft); scroll-snap-align: start;
+}
+.look-n3 .look-item { flex: 0 0 62%; }
+.look-item img, .look-item video {
+  display: block; width: 100%; height: 100%; object-fit: cover;
+  transition: transform 1.4s var(--ease);
+}
+.look-item video { pointer-events: none; }
+.reveal-on .look[data-reveal] .look-item img, .reveal-on .look[data-reveal] .look-item video { transform: scale(1.12); }
+.reveal-on .look[data-reveal].is-in .look-item img, .reveal-on .look[data-reveal].is-in .look-item video { transform: none; }
+.look-item:active img, .look-item:active video { transform: scale(.98); }
 .tile video { pointer-events: none; }
 .tile-caption {
   position: absolute; left: 0; right: 0; bottom: 0;

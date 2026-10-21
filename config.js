@@ -45,22 +45,55 @@ window.SITE = {
 
   // Портфолио. Файлы кладите в папку photos, имя пишите в src.
   // Новые работы добавляйте сверху списка: они показываются первыми.
+  // Одна работа: { src: "photos/work-01.jpg", category: "hair", title: "..." }
   // Видео: { video: "photos/video-01.mp4", poster: "photos/video-01.jpg", badge: "до / после", ... }
+  // Блок образа (фото и видео вместе): { category, title, note: "подпись", media: [ {src}, {video, poster, badge} ] }
   works: [
     { src: "photos/work-11.jpg", category: "makeup", title: "Голливудский макияж" },
-    { src: "photos/work-12.jpg", category: "makeup", title: "Растушёванная стрелка" },
-    { src: "photos/work-13.jpg", category: "makeup", title: "Растушёванная стрелка" },
     { src: "photos/work-10.jpg", category: "makeup", title: "Нюдовый макияж" },
+    {
+      category: "hair", title: "Голливудская волна",
+      note: "Такая причёска подойдёт для более официального образа",
+      media: [
+        { src: "photos/work-05.jpg" },
+        { video: "photos/video-02.mov", fallback: "photos/video-02.mp4", poster: "photos/video-02.jpg", badge: "до / после" },
+        { video: "photos/video-03.mp4", poster: "photos/video-03.jpg" }
+      ]
+    },
     { src: "photos/work-07.jpg", category: "makeup", title: "Смоки" },
     { src: "photos/work-08.jpg", category: "makeup", title: "Смоки" },
-    { src: "photos/work-09.jpg", category: "makeup", title: "Смоки, до и после" },
-    { src: "photos/work-06.jpg", category: "makeup", title: "Лифтинг-макияж, до и после" },
-    { video: "photos/video-01.mp4", poster: "photos/video-01.jpg", category: "makeup", title: "Смоки лифтинг-макияж", badge: "до / после" },
-    { src: "photos/work-05.jpg", category: "hair", title: "Голливудская волна" },
+    {
+      category: "makeup", title: "Смоки, до и после",
+      media: [
+        { src: "photos/work-09.jpg" },
+        { video: "photos/video-05.mp4", poster: "photos/video-05.jpg", badge: "до / после" }
+      ]
+    },
     { src: "photos/work-04.jpg", category: "hair", title: "Объёмные локоны" },
-    { src: "photos/work-03.jpg", category: "hair", title: "Серф-локоны" },
     { src: "photos/work-02.jpg", category: "hair", title: "Низкий текстурный пучок" },
-    { src: "photos/work-01.jpg", category: "hair", title: "Высокий текстурный пучок" }
+    {
+      category: "makeup", title: "Растушёванная стрелка",
+      media: [
+        { src: "photos/work-12.jpg" },
+        { video: "photos/video-06.mp4", poster: "photos/video-06.jpg" }
+      ]
+    },
+    { src: "photos/work-13.jpg", category: "makeup", title: "Растушёванная стрелка" },
+    { src: "photos/work-01.jpg", category: "hair", title: "Высокий текстурный пучок" },
+    {
+      category: "hair", title: "Серф-локоны",
+      media: [
+        { src: "photos/work-03.jpg" },
+        { video: "photos/video-04.mp4", poster: "photos/video-04.jpg", badge: "процесс" }
+      ]
+    },
+    {
+      category: "makeup", title: "Смоки лифтинг-макияж",
+      media: [
+        { src: "photos/work-06.jpg" },
+        { video: "photos/video-01.mp4", poster: "photos/video-01.jpg", badge: "до / после" }
+      ]
+    }
   ],
 
   // Услуги. category берётся из списка categories выше.
