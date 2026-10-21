@@ -125,9 +125,13 @@
         ? '<source src="' + esc(m.video) + '"' + (/\.mov$/i.test(m.video) ? ' type="video/quicktime"' : "") + '>' +
           '<source src="' + esc(m.fallback) + '" type="video/mp4">'
         : '<source src="' + esc(m.video) + '" type="video/mp4">';
-      return "<video" + (m.poster ? ' poster="' + esc(m.poster) + '"' : "") +
-        " muted loop playsinline" + (inLightbox ? ' autoplay preload="auto" controls' : ' preload="none" data-auto') + ">" +
-        srcs + "</video>";
+      if (inLightbox) {
+        return "<video" + (m.poster ? ' poster="' + esc(m.poster) + '"' : "") +
+          ' muted loop playsinline autoplay preload="auto" controls>' + srcs + "</video>";
+      }
+      // В сетке обложка видна сразу картинкой, а видео проявляется поверх, когда реально заиграло
+      return (m.poster ? '<img class="vposter" src="' + esc(m.poster) + '" alt="" loading="lazy">' : "") +
+        '<video muted loop playsinline preload="none" data-auto>' + srcs + "</video>";
     }
     if (m.src) {
       return '<img src="' + esc(m.src) + '" alt="' + esc(alt || "") + '"' + (inLightbox ? "" : ' loading="lazy"') + ' data-ph="' + wi + '">';
@@ -163,7 +167,7 @@
         var n = slides.push({ w: w, m: m, wi: x.i }) - 1;
         return '<button class="look-item' + (m.video ? " is-video" : "") + '" type="button" data-slide="' + n + '"' +
           ' data-cap="' + esc(m.caption || w.title || "") + '" data-note="' + esc(m.note || w.note || "") + '"' +
-          (m.ratio ? ' style="aspect-ratio:' + esc(m.ratio) + ";--r:" + ratioNum(m.ratio) + '"' : "") + ">" +
+          ">" +
           media(m, x.i, false, m.caption || w.title) + (m.video ? badge(m) : "") + "</button>";
       }).join("");
       var multi = items.length > 1;
@@ -177,13 +181,6 @@
         }).join("") + '<em>' + items.length + " " + plural(items.length, ["кадр", "кадра", "кадров"]) + "</em></div>" : "") +
         "</article>";
     }).join("");
-  }
-
-  // "590 / 784" -> 0.7526: ширина кадра считается от его высоты
-  function ratioNum(r) {
-    var p = String(r).split("/");
-    var v = parseFloat(p[0]) / parseFloat(p[1]);
-    return isFinite(v) && v > 0 ? v.toFixed(4) : "0.75";
   }
 
   function titleWords(t) {
@@ -225,7 +222,8 @@
   var vio = "IntersectionObserver" in window ? new IntersectionObserver(function (es) {
     es.forEach(function (e) {
       var v = e.target;
-      if (e.isIntersecting) { var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); }
+      v.dataset.inView = e.isIntersecting ? "1" : "0";
+      if (e.isIntersecting) tryPlay(v);
       else v.pause();
     });
   }, { threshold: 0.25 }) : null;
@@ -233,17 +231,24 @@
   var pio = "IntersectionObserver" in window ? new IntersectionObserver(function (es) {
     es.forEach(function (e) {
       if (!e.isIntersecting) return;
-      var v = e.target;
-      v.preload = "auto";
-      v.load();
-      pio.unobserve(v);
+      e.target.preload = "auto";
+      pio.unobserve(e.target);
     });
   }, { rootMargin: "100% 0px 100% 0px" }) : null;
   function autoplay(root) {
     Array.prototype.forEach.call(root.querySelectorAll("video[data-auto]"), function (v) {
+      v.muted = true; // iPhone запускает сам только беззвучное видео
+      v.addEventListener("playing", function () { v.classList.add("is-playing"); });
+      // если видео догрузилось, пока было на экране, запускаем ещё раз
+      v.addEventListener("canplay", function () { if (v.dataset.inView === "1" && v.paused) tryPlay(v); });
       if (pio) pio.observe(v);
-      if (vio) vio.observe(v); else { v.autoplay = true; v.play(); }
+      if (vio) vio.observe(v); else { v.autoplay = true; tryPlay(v); }
     });
+  }
+  function tryPlay(v) {
+    v.preload = "auto";
+    var pr = v.play();
+    if (pr && pr.catch) pr.catch(function () {});
   }
 
   // Если файла ещё нет, ставим заглушку
