@@ -46,7 +46,7 @@ window.SITE = {
   // Портфолио. Файлы кладите в папку photos, имя пишите в src.
   // Новые работы добавляйте сверху списка: они показываются первыми.
   // Одна работа: { src: "photos/work-01.jpg", category: "hair", title: "..." }
-  // Видео: { video: "photos/video-01.mp4", poster: "photos/video-01.jpg", badge: "до / после", ... }
+  // Видео: { video: "photos/video-01.mp4", poster: "photos/cover-01.jpg", badge: "до / после", ... }
   // ratio: пропорции файла, их проставляю я, чтобы кадр показывался целиком
   // Блок образа (один и тот же человек): { category, title, note, media: [ {src}, {video, poster, badge, caption, note} ] }
   // caption и note у кадра нужны, когда у кадра своё название
@@ -61,9 +61,9 @@ window.SITE = {
       category: "hair", title: "Голливудская волна",
       media: [
         { src: "photos/work-05.jpg", ratio: "590 / 1046" },
-        { video: "photos/video-02.mov", fallback: "photos/video-02.mp4", poster: "photos/video-02.jpg", badge: "до / после", ratio: "1080 / 1920",
+        { video: "photos/video-02.mov", fallback: "photos/video-02.mp4", poster: "photos/cover-02.jpg", badge: "до / после", ratio: "1080 / 1920",
           caption: "До/после: объёмные локоны", note: "Такая причёска подойдёт для более официального образа" },
-        { video: "photos/video-03.mp4", poster: "photos/video-03.jpg", ratio: "464 / 848" }
+        { video: "photos/video-03.mp4", poster: "photos/cover-03.jpg", ratio: "464 / 848" }
       ]
     },
 
@@ -72,7 +72,7 @@ window.SITE = {
       // Один и тот же человек: видео «До/после смоки лифтинг-макияж» и фото «Лифтинг-макияж»
       category: "makeup", title: "Лифтинг-макияж",
       media: [
-        { video: "photos/video-01.mp4", poster: "photos/video-01.jpg", badge: "до / после", ratio: "720 / 1280", caption: "До/после: смоки лифтинг-макияж" },
+        { video: "photos/video-01.mp4", poster: "photos/cover-01.jpg", badge: "до / после", ratio: "720 / 1280", caption: "До/после: смоки лифтинг-макияж" },
         { src: "photos/work-06.jpg", ratio: "590 / 1046", caption: "Лифтинг-макияж" }
       ]
     },
@@ -82,7 +82,7 @@ window.SITE = {
       category: "makeup", title: "Смоки",
       media: [
         { src: "photos/work-09.jpg", ratio: "590 / 1046" },
-        { video: "photos/video-05.mp4", poster: "photos/video-05.jpg", badge: "до / после", ratio: "720 / 1280" }
+        { video: "photos/video-05.mp4", poster: "photos/cover-05.jpg", badge: "до / после", ratio: "720 / 1280" }
       ]
     },
     { src: "photos/work-10.jpg", category: "makeup", title: "Нюдовый макияж", ratio: "590 / 782" },
@@ -91,7 +91,7 @@ window.SITE = {
       category: "makeup", title: "Растушёванная стрелка",
       media: [
         { src: "photos/work-12.jpg", ratio: "590 / 784" },
-        { video: "photos/video-06.mp4", poster: "photos/video-06.jpg", ratio: "720 / 1280" }
+        { video: "photos/video-06.mp4", poster: "photos/cover-06.jpg", ratio: "720 / 1280" }
       ]
     },
     { src: "photos/work-13.jpg", category: "makeup", title: "Растушёванная стрелка", ratio: "576 / 1200" }
