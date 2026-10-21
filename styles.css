@@ -261,12 +261,12 @@ a.chip { text-decoration: none; }
   border-radius: 20px; overflow: hidden; background: var(--accent-soft);
   box-shadow: 0 30px 60px -40px rgba(43, 33, 29, .6);
   isolation: isolate;
-  transition: clip-path 1.5s var(--ease) .25s, opacity 1.2s ease .25s, transform 1.4s var(--ease) .25s;
+  transition: clip-path .9s var(--ease), opacity .7s ease, transform .9s var(--ease);
 }
-.look-item img, .look-item video { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 1.8s var(--ease) .25s; }
+.look-item img, .look-item video { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 1.1s var(--ease); }
 /* Размытое превью фоном, чёткое фото проявляется поверх, когда загрузилось */
 .look-item { background-size: cover; background-position: center; }
-.look-item img[data-full] { opacity: 0; transition: opacity .7s ease, transform 1.8s var(--ease) .25s; }
+.look-item img[data-full] { opacity: 0; transition: opacity .4s ease, transform 1.1s var(--ease); }
 .look-item img[data-full].ld { opacity: 1; }
 .look-item .play {
   position: absolute; left: 50%; top: 50%; z-index: 1; transform: translate(-50%, -50%);

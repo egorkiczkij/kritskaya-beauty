@@ -178,6 +178,21 @@
     reveal($("gallery"));
     autoplay($("gallery"));
     bindDots($("gallery"));
+    prefetch($("gallery"));
+  }
+
+  // Фото ленты грузим заранее: за два экрана до появления, а после загрузки страницы и все остальные
+  function prefetch(root) {
+    var imgs = Array.prototype.slice.call(root.querySelectorAll('img[loading="lazy"]'));
+    var go = function (img) { img.loading = "eager"; };
+    if ("IntersectionObserver" in window) {
+      var near = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.isIntersecting) { go(e.target); near.unobserve(e.target); } });
+      }, { rootMargin: "200% 0px 200% 0px" });
+      imgs.forEach(function (i) { near.observe(i); });
+    }
+    var all = function () { setTimeout(function () { imgs.forEach(go); }, 300); };
+    if (document.readyState === "complete") all(); else window.addEventListener("load", all);
   }
 
   // Каждый образ отдельным блоком: название по центру, под ним кадры (несколько листаются вбок)
