@@ -206,6 +206,13 @@
       var row = look.querySelector(".look-media"), dots = look.querySelectorAll(".look-dots span");
       var frames = row.querySelectorAll(".look-item"), h3 = look.querySelector(".look-head h3"), note = look.querySelector(".look-note");
       var cur = 0;
+      // Первый кадр сразу ровно по центру
+      var center = function () {
+        var f = frames[0];
+        if (f) row.scrollLeft = f.offsetLeft + f.offsetWidth / 2 - row.clientWidth / 2;
+      };
+      center();
+      window.addEventListener("load", center);
       row.addEventListener("scroll", function () {
         var mid = row.scrollLeft + row.clientWidth / 2, k = 0, best = 1e9;
         Array.prototype.forEach.call(frames, function (f, j) {
