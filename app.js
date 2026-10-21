@@ -136,9 +136,10 @@
         return "<video" + (m.poster ? ' poster="' + esc(m.poster) + '"' : "") +
           ' muted loop playsinline autoplay preload="auto" controls>' + srcs + "</video>";
       }
-      // В ленте только обложка с кнопкой ▶: само видео грузится по нажатию
+      // В ленте: обложка сразу, видео играет без звука поверх неё, пока видно на экране
       return (m.poster ? lightImg(m.poster, "") : "") +
-        '<span class="play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6.5v11l9-5.5z"/></svg></span>';
+        '<span class="play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6.5v11l9-5.5z"/></svg></span>' +
+        '<video muted loop playsinline preload="none" data-auto>' + srcs + "</video>";
     }
     if (m.src) {
       if (inLightbox) return '<img src="' + esc(m.src) + '" alt="' + esc(alt || "") + '" data-ph="' + wi + '">';
@@ -290,7 +291,7 @@
   function autoplay(root) {
     Array.prototype.forEach.call(root.querySelectorAll("video[data-auto]"), function (v) {
       v.muted = true; // iPhone запускает сам только беззвучное видео
-      v.addEventListener("playing", function () { v.classList.add("is-playing"); });
+      v.addEventListener("playing", function () { v.classList.add("is-playing"); v.parentNode.classList.add("playing"); });
       // если видео догрузилось, пока было на экране, запускаем ещё раз
       v.addEventListener("canplay", function () { if (v.dataset.inView === "1" && v.paused) tryPlay(v); });
       if (vio) vio.observe(v); else { v.autoplay = true; tryPlay(v); }

@@ -275,6 +275,10 @@ a.chip { text-decoration: none; }
   background: rgba(255, 251, 247, .88); color: var(--ink);
   box-shadow: 0 10px 30px -10px rgba(43, 33, 29, .5);
 }
+.look-item video { position: absolute; inset: 0; opacity: 0; transition: opacity .6s ease; }
+.look-item video.is-playing { opacity: 1; }
+.look-item .play { transition: opacity .4s ease; }
+.look-item.playing .play { opacity: 0; }
 .look-item .play svg { width: 22px; height: 22px; margin-left: 3px; fill: currentColor; stroke: none; }
 .look-item video { pointer-events: none; }
 .look-item:active img, .look-item:active video { transform: scale(.985); }
