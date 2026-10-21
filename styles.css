@@ -237,6 +237,7 @@ a.chip { text-decoration: none; }
 /* Кадры одной ширины, высота по пропорциям файла (без обрезки); самые высокие ограничены высотой экрана */
 .look { --w: min(72vw, 300px); --hmax: 60vh; margin: 0; padding: 40px 0 4px; }
 @supports (height: 1svh) { .look { --hmax: 60svh; } }
+.look.look-cont { padding-top: 20px; }
 .look-head { display: grid; justify-items: center; gap: 10px; text-align: center; margin-bottom: 18px; }
 .look-head h3 {
   margin: 0; font-family: var(--serif); font-weight: 400;

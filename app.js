@@ -197,8 +197,12 @@
 
   // Каждый образ отдельным блоком: название по центру, под ним кадры (несколько листаются вбок)
   function renderGroup(shown) {
+    var prevTitle = null;
     return shown.map(function (x) {
       var w = x.w, items = itemsOf(w);
+      // Работы подряд с одинаковым названием идут под одной надписью
+      var cont = !!w.title && w.title === prevTitle && !items[0].caption;
+      prevTitle = w.title;
       var head0 = items[0].caption || w.title, note0 = items[0].note || w.note;
       var frames = items.map(function (m) {
         var n = slides.push({ w: w, m: m, wi: x.i }) - 1;
@@ -208,10 +212,10 @@
           media(m, x.i, false, m.caption || w.title) + (m.video ? badge(m) : "") + "</button>";
       }).join("");
       var multi = items.length > 1;
-      return '<article class="look' + (multi ? " look-multi" : "") + '" data-reveal>' +
-        '<header class="look-head"><h3>' + titleWords(head0) + "</h3>" +
+      return '<article class="look' + (multi ? " look-multi" : "") + (cont ? " look-cont" : "") + '" data-reveal>' +
+        (cont ? "" : '<header class="look-head"><h3>' + titleWords(head0) + "</h3>" +
         '<span class="look-rule"><i></i><b>✦</b><i></i></span>' +
-        '<p class="look-note"' + (note0 ? "" : " hidden") + ">" + esc(note0 || "") + "</p></header>" +
+        '<p class="look-note"' + (note0 ? "" : " hidden") + ">" + esc(note0 || "") + "</p></header>") +
         '<div class="look-media">' + frames + "</div>" +
         (multi ? '<div class="look-dots">' + items.map(function (m, k) {
           return '<span class="' + (k ? "" : "on") + '"></span>';
@@ -256,11 +260,11 @@
         Array.prototype.forEach.call(dots, function (d, j) { d.classList.toggle("on", j === k); });
         var prev = frames[cur], next = frames[k];
         cur = k;
-        if (prev.getAttribute("data-cap") !== next.getAttribute("data-cap")) {
+        if (h3 && prev.getAttribute("data-cap") !== next.getAttribute("data-cap")) {
           h3.innerHTML = titleWords(next.getAttribute("data-cap"));
           h3.classList.remove("swap"); void h3.offsetWidth; h3.classList.add("swap");
         }
-        if (prev.getAttribute("data-note") !== next.getAttribute("data-note")) {
+        if (note && prev.getAttribute("data-note") !== next.getAttribute("data-note")) {
           note.textContent = next.getAttribute("data-note");
           note.hidden = !note.textContent;
           note.classList.remove("swap"); void note.offsetWidth; note.classList.add("swap");
