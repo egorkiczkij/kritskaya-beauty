@@ -210,17 +210,23 @@
       // Работы подряд с одинаковым названием идут под одной надписью
       var cont = !!w.title && w.title === prevTitle && !items[0].caption;
       prevTitle = w.title;
-      // Одно постоянное название на блок: при листании оно не меняется, страница не прыгает
-      var head0 = w.title, note0 = w.note;
+      // Названия кадров лежат друг на друге в одной ячейке: место отведено по самому длинному,
+      // поэтому при листании меняется только текст, а страница не сдвигается
+      var caps = [];
+      items.forEach(function (m) { var c = m.caption || w.title; if (caps.indexOf(c) < 0) caps.push(c); });
+      var head0 = caps.map(function (c, k) {
+        return '<span class="cap' + (k ? "" : " on") + '">' + titleWords(c) + "</span>";
+      }).join(""), note0 = w.note;
       var frames = items.map(function (m) {
         var n = slides.push({ w: w, m: m, wi: x.i }) - 1;
         return '<button class="look-item' + (m.video ? " is-video" : "") + '" type="button" data-slide="' + n + '"' +
+          ' data-capi="' + caps.indexOf(m.caption || w.title) + '"' +
           ' style="' + blurBg(m) + (m.ratio ? "aspect-ratio:" + esc(m.ratio) + ";--r:" + ratioNum(m.ratio) : "") + '">' +
           media(m, x.i, false, m.caption || w.title) + (m.video ? badge(m) : "") + "</button>";
       }).join("");
       var multi = items.length > 1;
       return '<article class="look' + (multi ? " look-multi" : "") + (cont ? " look-cont" : "") + '" data-reveal>' +
-        (cont ? '<div class="look-sep"><span class="look-rule"><i></i><b>✦</b><i></i></span></div>' : '<header class="look-head"><h3>' + titleWords(head0) + "</h3>" +
+        (cont ? '<div class="look-sep"><span class="look-rule"><i></i><b>✦</b><i></i></span></div>' : '<header class="look-head"><h3>' + head0 + "</h3>" +
         '<span class="look-rule"><i></i><b>✦</b><i></i></span>' +
         '<p class="look-note"' + (note0 ? "" : " hidden") + ">" + esc(note0 || "") + "</p></header>") +
         '<div class="look-media">' + frames + "</div>" +
@@ -248,7 +254,7 @@
   function bindDots(root) {
     Array.prototype.forEach.call(root.querySelectorAll(".look-multi"), function (look) {
       var row = look.querySelector(".look-media"), dots = look.querySelectorAll(".look-dots span");
-      var frames = row.querySelectorAll(".look-item");
+      var frames = row.querySelectorAll(".look-item"), capEls = look.querySelectorAll(".look-head .cap");
       var cur = 0;
       // Первый кадр сразу ровно по центру
       var center = function () {
@@ -265,6 +271,8 @@
         });
         if (k === cur) return;
         Array.prototype.forEach.call(dots, function (d, j) { d.classList.toggle("on", j === k); });
+        var ci = +frames[k].getAttribute("data-capi");
+        Array.prototype.forEach.call(capEls, function (c, j) { c.classList.toggle("on", j === ci); });
         cur = k;
       }, { passive: true });
     });
