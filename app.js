@@ -109,7 +109,8 @@
     var used = (S.categories || []).filter(function (c) {
       return works.some(function (w) { return w.category === c.id; });
     });
-    $("filters").hidden = used.length < 2;
+    // Разделы показаны отдельными блоками, фильтр не нужен
+    $("filters").hidden = true;
     var items = [{ id: "all", title: "Все" }].concat(used);
     $("filters").innerHTML = items.map(function (c) {
       return '<button class="chip' + (c.id === filter ? " is-active" : "") + '" data-filter="' + esc(c.id) + '" type="button" role="tab">' + esc(c.title) + "</button>";
@@ -138,33 +139,59 @@
 
   function renderGallery() {
     slides = [];
-    var shown = works.map(function (w, i) { return { w: w, i: i }; })
-      .filter(function (x) { return filter === "all" || x.w.category === filter; });
-    $("works-count").textContent = shown.length ? shown.length + " " + plural(shown.length, ["работа", "работы", "работ"]) : "";
-    var single = 0;
-    $("gallery").innerHTML = shown.map(function (x) {
-      var w = x.w, items = itemsOf(w);
-      if (items.length === 1) {
-        var n = slides.push({ w: w, m: items[0], wi: x.i }) - 1;
-        var d = (single++ % 2) * 120;
-        return '<button class="tile" type="button" data-reveal data-slide="' + n + '" style="--d:' + d + 'ms">' +
-          media(items[0], x.i, false, w.title) + (items[0].video ? badge(items[0]) : "") +
-          (w.title ? '<span class="tile-caption">' + esc(w.title) + "</span>" : "") + "</button>";
-      }
-      single = 0;
-      return '<article class="look look-n' + Math.min(items.length, 3) + '" data-reveal>' +
-        '<div class="look-head"><p class="eyebrow">' + esc(catTitle(w.category)) + "</p>" +
-        "<h3>" + esc(w.title) + "</h3>" +
-        (w.note ? '<p class="look-note">' + esc(w.note) + "</p>" : "") + "</div>" +
-        '<div class="look-media">' + items.map(function (m) {
-          var n = slides.push({ w: w, m: m, wi: x.i }) - 1;
-          return '<button class="look-item" type="button" data-slide="' + n + '">' +
-            media(m, x.i, false, w.title) + (m.video ? badge(m) : "") + "</button>";
-        }).join("") + "</div></article>";
+    var all = works.map(function (w, i) { return { w: w, i: i }; });
+    $("works-count").textContent = all.length ? all.length + " " + plural(all.length, ["работа", "работы", "работ"]) : "";
+    // Отдельный раздел на каждую категорию, в порядке списка categories
+    $("gallery").innerHTML = (S.categories || []).map(function (c) {
+      var shown = all.filter(function (x) { return x.w.category === c.id; });
+      if (!shown.length) return "";
+      return '<div class="gal-group" id="works-' + esc(c.id) + '">' +
+        '<div class="gal-head" data-reveal><h3>' + esc(c.title) + "</h3><span>" +
+        shown.length + " " + plural(shown.length, ["работа", "работы", "работ"]) + "</span></div>" +
+        '<div class="gal-grid">' + renderGroup(shown) + "</div></div>";
     }).join("");
     attachFallbacks($("gallery"));
     reveal($("gallery"));
     autoplay($("gallery"));
+    bindDots($("gallery"));
+  }
+
+  // Каждый образ отдельным блоком: название по центру, под ним кадры (несколько листаются вбок)
+  function renderGroup(shown) {
+    return shown.map(function (x) {
+      var w = x.w, items = itemsOf(w);
+      var words = String(w.title || "").split(" ").map(function (t, k) {
+        return '<span class="ln"><span style="--k:' + k + '">' + esc(t) + "</span></span>";
+      }).join(" ");
+      var frames = items.map(function (m) {
+        var n = slides.push({ w: w, m: m, wi: x.i }) - 1;
+        return '<button class="look-item' + (m.video ? " is-video" : "") + '" type="button" data-slide="' + n + '"' +
+          (m.ratio ? ' style="aspect-ratio:' + esc(m.ratio) + '"' : "") + ">" +
+          media(m, x.i, false, w.title) + (m.video ? badge(m) : "") + "</button>";
+      }).join("");
+      var multi = items.length > 1;
+      return '<article class="look' + (multi ? " look-multi" : "") + '" data-reveal>' +
+        '<header class="look-head"><h3>' + words + "</h3>" +
+        '<span class="look-rule"><i></i><b>✦</b><i></i></span>' +
+        (w.note ? '<p class="look-note">' + esc(w.note) + "</p>" : "") + "</header>" +
+        '<div class="look-media">' + frames + "</div>" +
+        (multi ? '<div class="look-dots">' + items.map(function (m, k) {
+          return '<span class="' + (k ? "" : "on") + '"></span>';
+        }).join("") + '<em>' + items.length + " " + plural(items.length, ["кадр", "кадра", "кадров"]) + "</em></div>" : "") +
+        "</article>";
+    }).join("");
+  }
+
+  // Точки под каруселью показывают, какой кадр сейчас в центре
+  function bindDots(root) {
+    Array.prototype.forEach.call(root.querySelectorAll(".look-multi"), function (look) {
+      var row = look.querySelector(".look-media"), dots = look.querySelectorAll(".look-dots span");
+      row.addEventListener("scroll", function () {
+        var w = row.firstElementChild ? row.firstElementChild.offsetWidth + 12 : 1;
+        var k = Math.round(row.scrollLeft / w);
+        Array.prototype.forEach.call(dots, function (d, j) { d.classList.toggle("on", j === k); });
+      }, { passive: true });
+    });
   }
 
   // Видео в сетке играют без звука, только пока видны на экране: так не тратится мобильный трафик

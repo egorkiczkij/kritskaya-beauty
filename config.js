@@ -36,10 +36,10 @@ window.SITE = {
   // Мелкий шрифт под услугами, например "Выезд по городу: +500 ₽". Пусто: блок скрыт.
   notes: [],
 
-  // Разделы портфолио и услуг
+  // Разделы портфолио и услуг. В этом порядке они идут на сайте
   categories: [
-    { id: "makeup", title: "Макияж" },
     { id: "hair", title: "Причёски" },
+    { id: "makeup", title: "Макияж" },
     { id: "look", title: "Полный образ" }
   ],
 
@@ -47,51 +47,52 @@ window.SITE = {
   // Новые работы добавляйте сверху списка: они показываются первыми.
   // Одна работа: { src: "photos/work-01.jpg", category: "hair", title: "..." }
   // Видео: { video: "photos/video-01.mp4", poster: "photos/video-01.jpg", badge: "до / после", ... }
+  // ratio: пропорции файла, их проставляю я, чтобы кадр показывался целиком
   // Блок образа (фото и видео вместе): { category, title, note: "подпись", media: [ {src}, {video, poster, badge} ] }
   works: [
-    { src: "photos/work-11.jpg", category: "makeup", title: "Голливудский макияж" },
-    { src: "photos/work-10.jpg", category: "makeup", title: "Нюдовый макияж" },
+    { src: "photos/work-04.jpg", category: "hair", title: "Объёмные локоны", ratio: "590 / 783" },
+    { src: "photos/work-02.jpg", category: "hair", title: "Низкий текстурный пучок", ratio: "590 / 784" },
+    { src: "photos/work-01.jpg", category: "hair", title: "Высокий текстурный пучок", ratio: "590 / 784" },
     {
       category: "hair", title: "Голливудская волна",
       note: "Такая причёска подойдёт для более официального образа",
       media: [
-        { src: "photos/work-05.jpg" },
-        { video: "photos/video-02.mov", fallback: "photos/video-02.mp4", poster: "photos/video-02.jpg", badge: "до / после" },
-        { video: "photos/video-03.mp4", poster: "photos/video-03.jpg" }
+        { src: "photos/work-05.jpg", ratio: "590 / 1046" },
+        { video: "photos/video-02.mov", fallback: "photos/video-02.mp4", poster: "photos/video-02.jpg", badge: "до / после", ratio: "1080 / 1920" },
+        { video: "photos/video-03.mp4", poster: "photos/video-03.jpg", ratio: "464 / 848" }
       ]
     },
-    { src: "photos/work-07.jpg", category: "makeup", title: "Смоки" },
-    { src: "photos/work-08.jpg", category: "makeup", title: "Смоки" },
-    {
-      category: "makeup", title: "Смоки, до и после",
-      media: [
-        { src: "photos/work-09.jpg" },
-        { video: "photos/video-05.mp4", poster: "photos/video-05.jpg", badge: "до / после" }
-      ]
-    },
-    { src: "photos/work-04.jpg", category: "hair", title: "Объёмные локоны" },
-    { src: "photos/work-02.jpg", category: "hair", title: "Низкий текстурный пучок" },
-    {
-      category: "makeup", title: "Растушёванная стрелка",
-      media: [
-        { src: "photos/work-12.jpg" },
-        { video: "photos/video-06.mp4", poster: "photos/video-06.jpg" }
-      ]
-    },
-    { src: "photos/work-13.jpg", category: "makeup", title: "Растушёванная стрелка" },
-    { src: "photos/work-01.jpg", category: "hair", title: "Высокий текстурный пучок" },
     {
       category: "hair", title: "Серф-локоны",
       media: [
-        { src: "photos/work-03.jpg" },
-        { video: "photos/video-04.mp4", poster: "photos/video-04.jpg", badge: "процесс" }
+        { src: "photos/work-03.jpg", ratio: "590 / 784" },
+        { video: "photos/video-04.mp4", poster: "photos/video-04.jpg", badge: "процесс", ratio: "720 / 1280" }
+      ]
+    },
+    { src: "photos/work-11.jpg", category: "makeup", title: "Голливудский макияж", ratio: "590 / 1046" },
+    { src: "photos/work-10.jpg", category: "makeup", title: "Нюдовый макияж", ratio: "590 / 782" },
+    { src: "photos/work-07.jpg", category: "makeup", title: "Смоки", ratio: "590 / 784" },
+    {
+      category: "makeup", title: "Смоки, до и после",
+      media: [
+        { src: "photos/work-09.jpg", ratio: "590 / 1046" },
+        { video: "photos/video-05.mp4", poster: "photos/video-05.jpg", badge: "до / после", ratio: "720 / 1280" }
+      ]
+    },
+    { src: "photos/work-08.jpg", category: "makeup", title: "Смоки", ratio: "590 / 784" },
+    { src: "photos/work-13.jpg", category: "makeup", title: "Растушёванная стрелка", ratio: "576 / 1200" },
+    {
+      category: "makeup", title: "Растушёванная стрелка",
+      media: [
+        { src: "photos/work-12.jpg", ratio: "590 / 784" },
+        { video: "photos/video-06.mp4", poster: "photos/video-06.jpg", ratio: "720 / 1280" }
       ]
     },
     {
       category: "makeup", title: "Смоки лифтинг-макияж",
       media: [
-        { src: "photos/work-06.jpg" },
-        { video: "photos/video-01.mp4", poster: "photos/video-01.jpg", badge: "до / после" }
+        { src: "photos/work-06.jpg", ratio: "590 / 1046" },
+        { video: "photos/video-01.mp4", poster: "photos/video-01.jpg", badge: "до / после", ratio: "720 / 1280" }
       ]
     }
   ],
