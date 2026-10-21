@@ -186,7 +186,24 @@
     autoplay($("gallery"));
     bindDots($("gallery"));
     prefetch($("gallery"));
+    fitLooks();
   }
+
+  // Высота кадра по свободному месту: экран минус верхняя строка, заголовок блока и кнопка записи,
+  // чтобы название и кадр целиком помещались на один экран
+  function fitLooks() {
+    var nav = ($("topnav") || {}).offsetHeight || 52;
+    var cta = document.body.classList.contains("in-tg") ? 16 : 96;
+    Array.prototype.forEach.call(document.querySelectorAll(".look"), function (look) {
+      var head = look.querySelector(".look-head, .look-sep");
+      var dots = look.querySelector(".look-dots");
+      var free = window.innerHeight - nav - cta - (head ? head.offsetHeight + 18 : 0) - (dots ? dots.offsetHeight + 14 : 0) - 24;
+      look.style.setProperty("--hmax", Math.max(240, free) + "px");
+    });
+  }
+  window.addEventListener("resize", fitLooks);
+  window.addEventListener("load", fitLooks);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitLooks);
 
   // Фото ленты грузим заранее: за два экрана до появления, а после загрузки страницы и все остальные
   function prefetch(root) {
