@@ -38,8 +38,8 @@ window.SITE = {
 
   // Разделы портфолио и услуг. В этом порядке они идут на сайте
   categories: [
-    { id: "hair", title: "Причёски" },
     { id: "makeup", title: "Макияж" },
+    { id: "hair", title: "Причёски" },
     { id: "look", title: "Полный образ" }
   ],
 

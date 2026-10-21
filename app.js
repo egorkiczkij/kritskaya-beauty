@@ -104,16 +104,14 @@
 
   var itemsOf = function (w) { return w.media && w.media.length ? w.media : [w]; };
 
+  // Под заголовком «Мои работы»: кнопки перехода к разделам
   function renderFilters() {
-    // Показываем только разделы, где уже есть работы
     var used = (S.categories || []).filter(function (c) {
       return works.some(function (w) { return w.category === c.id; });
     });
-    // Разделы показаны отдельными блоками, фильтр не нужен
-    $("filters").hidden = true;
-    var items = [{ id: "all", title: "Все" }].concat(used);
-    $("filters").innerHTML = items.map(function (c) {
-      return '<button class="chip' + (c.id === filter ? " is-active" : "") + '" data-filter="' + esc(c.id) + '" type="button" role="tab">' + esc(c.title) + "</button>";
+    $("filters").hidden = used.length < 2;
+    $("filters").innerHTML = used.map(function (c) {
+      return '<a class="chip" href="#works-' + esc(c.id) + '">' + esc(c.title) + "</a>";
     }).join("");
   }
 
@@ -160,22 +158,19 @@
   function renderGroup(shown) {
     return shown.map(function (x) {
       var w = x.w, items = itemsOf(w);
-      var words = String(w.title || "").split(" ").map(function (t, k) {
-        return '<span class="ln"><span style="--k:' + k + '">' + esc(t) + "</span></span>";
-      }).join(" ");
+      var head0 = items[0].caption || w.title, note0 = items[0].note || w.note;
       var frames = items.map(function (m) {
         var n = slides.push({ w: w, m: m, wi: x.i }) - 1;
         return '<button class="look-item' + (m.video ? " is-video" : "") + '" type="button" data-slide="' + n + '"' +
+          ' data-cap="' + esc(m.caption || w.title || "") + '" data-note="' + esc(m.note || w.note || "") + '"' +
           (m.ratio ? ' style="aspect-ratio:' + esc(m.ratio) + '"' : "") + ">" +
-          media(m, x.i, false, m.caption || w.title) + (m.video ? badge(m) : "") +
-          (m.caption ? '<span class="frame-cap">' + esc(m.caption) + (m.note ? "<small>" + esc(m.note) + "</small>" : "") + "</span>" : "") +
-          "</button>";
+          media(m, x.i, false, m.caption || w.title) + (m.video ? badge(m) : "") + "</button>";
       }).join("");
       var multi = items.length > 1;
       return '<article class="look' + (multi ? " look-multi" : "") + '" data-reveal>' +
-        '<header class="look-head"><h3>' + words + "</h3>" +
+        '<header class="look-head"><h3>' + titleWords(head0) + "</h3>" +
         '<span class="look-rule"><i></i><b>✦</b><i></i></span>' +
-        (w.note ? '<p class="look-note">' + esc(w.note) + "</p>" : "") + "</header>" +
+        '<p class="look-note"' + (note0 ? "" : " hidden") + ">" + esc(note0 || "") + "</p></header>" +
         '<div class="look-media">' + frames + "</div>" +
         (multi ? '<div class="look-dots">' + items.map(function (m, k) {
           return '<span class="' + (k ? "" : "on") + '"></span>';
@@ -184,14 +179,37 @@
     }).join("");
   }
 
-  // Точки под каруселью показывают, какой кадр сейчас в центре
+  function titleWords(t) {
+    return String(t || "").split(" ").map(function (word, k) {
+      return '<span class="ln"><span style="--k:' + k + '">' + esc(word) + "</span></span>";
+    }).join(" ");
+  }
+
+  // При листании: точки показывают текущий кадр, а название сверху меняется на название этого кадра
   function bindDots(root) {
     Array.prototype.forEach.call(root.querySelectorAll(".look-multi"), function (look) {
       var row = look.querySelector(".look-media"), dots = look.querySelectorAll(".look-dots span");
+      var frames = row.querySelectorAll(".look-item"), h3 = look.querySelector(".look-head h3"), note = look.querySelector(".look-note");
+      var cur = 0;
       row.addEventListener("scroll", function () {
-        var w = row.firstElementChild ? row.firstElementChild.offsetWidth + 12 : 1;
-        var k = Math.round(row.scrollLeft / w);
+        var mid = row.scrollLeft + row.clientWidth / 2, k = 0, best = 1e9;
+        Array.prototype.forEach.call(frames, function (f, j) {
+          var dist = Math.abs(f.offsetLeft + f.offsetWidth / 2 - mid);
+          if (dist < best) { best = dist; k = j; }
+        });
+        if (k === cur) return;
         Array.prototype.forEach.call(dots, function (d, j) { d.classList.toggle("on", j === k); });
+        var prev = frames[cur], next = frames[k];
+        cur = k;
+        if (prev.getAttribute("data-cap") !== next.getAttribute("data-cap")) {
+          h3.innerHTML = titleWords(next.getAttribute("data-cap"));
+          h3.classList.remove("swap"); void h3.offsetWidth; h3.classList.add("swap");
+        }
+        if (prev.getAttribute("data-note") !== next.getAttribute("data-note")) {
+          note.textContent = next.getAttribute("data-note");
+          note.hidden = !note.textContent;
+          note.classList.remove("swap"); void note.offsetWidth; note.classList.add("swap");
+        }
       }, { passive: true });
     });
   }

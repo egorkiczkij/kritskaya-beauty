@@ -208,16 +208,20 @@ em { font-style: italic; font-weight: 400; color: var(--accent-deep); }
   font-size: 13px; color: var(--ink-soft);
   transition: background .3s, color .3s, border-color .3s;
 }
+a.chip { text-decoration: none; }
+.gal-group { scroll-margin-top: var(--nav-h); }
 .chip.is-active { background: var(--ink); border-color: var(--ink); color: var(--surface); }
 
 /* Галерея */
-.gal-group + .gal-group { margin-top: 72px; }
+/* Два раздела: макияж и причёски, каждый своей полосой со своим фоном */
+.gal-group { margin: 0 -16px; padding: 56px 16px 40px; }
+.gal-group + .gal-group { background: var(--bg-soft); border-top: 1px solid var(--line); margin-top: 32px; }
 .gal-head {
-  display: grid; justify-items: center; gap: 4px; text-align: center;
-  margin-bottom: 8px;
+  display: grid; justify-items: center; gap: 10px; text-align: center;
+  padding-bottom: 28px; border-bottom: 1px solid var(--ink);
 }
-.gal-head h3 { margin: 0; font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 44px; line-height: 1; color: var(--accent-deep); }
-.gal-head span { font-size: 11px; color: var(--muted); letter-spacing: .2em; text-transform: uppercase; }
+.gal-head h3 { margin: 0; font-family: var(--serif); font-weight: 300; font-size: clamp(56px, 17vw, 76px); line-height: .95; letter-spacing: -.02em; color: var(--ink); }
+.gal-head span { font-size: 11px; color: var(--accent-deep); letter-spacing: .24em; text-transform: uppercase; }
 .tile {
   display: block; width: 100%; break-inside: avoid; margin: 0 0 10px;
   position: relative; border-radius: 16px; overflow: hidden;
@@ -268,6 +272,11 @@ em { font-style: italic; font-weight: 400; color: var(--accent-deep); }
 }
 .look-multi .look-media::-webkit-scrollbar { display: none; }
 .look-multi .look-item { flex: none; width: auto; height: min(66vh, 520px); max-width: 84%; scroll-snap-align: center; }
+@keyframes lnIn { from { transform: translateY(105%); } to { transform: none; } }
+@keyframes noteIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.look-head h3.swap .ln > span { animation: lnIn .8s var(--ease) both; animation-delay: calc(var(--k) * 70ms); }
+.look-note.swap { animation: noteIn .7s var(--ease) both; }
+.look-head h3 { min-height: 1.02em; }
 /* Подпись отдельного кадра внутри блока */
 .frame-cap {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 1;
