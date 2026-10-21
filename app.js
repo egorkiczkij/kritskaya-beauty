@@ -167,7 +167,7 @@
         var n = slides.push({ w: w, m: m, wi: x.i }) - 1;
         return '<button class="look-item' + (m.video ? " is-video" : "") + '" type="button" data-slide="' + n + '"' +
           ' data-cap="' + esc(m.caption || w.title || "") + '" data-note="' + esc(m.note || w.note || "") + '"' +
-          ">" +
+          (m.ratio ? ' style="aspect-ratio:' + esc(m.ratio) + ";--r:" + ratioNum(m.ratio) + '"' : "") + ">" +
           media(m, x.i, false, m.caption || w.title) + (m.video ? badge(m) : "") + "</button>";
       }).join("");
       var multi = items.length > 1;
@@ -181,6 +181,13 @@
         }).join("") + '<em>' + items.length + " " + plural(items.length, ["кадр", "кадра", "кадров"]) + "</em></div>" : "") +
         "</article>";
     }).join("");
+  }
+
+  // "590 / 784" -> 0.7526 (ширина к высоте)
+  function ratioNum(r) {
+    var p = String(r).split("/");
+    var v = parseFloat(p[0]) / parseFloat(p[1]);
+    return isFinite(v) && v > 0 ? v.toFixed(4) : "0.75";
   }
 
   function titleWords(t) {

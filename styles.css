@@ -234,8 +234,9 @@ a.chip { text-decoration: none; }
 
 /* Образ: название по центру, линия, кадры. Анимация срабатывает, когда блок появляется на экране */
 /* Высота кадра: так, чтобы название и фото помещались на одном экране телефона */
-.look { --h: min(44vh, 390px); margin: 0; padding: 40px 0 4px; }
-@supports (height: 1svh) { .look { --h: min(44svh, 390px); } }
+/* Кадры одной ширины, высота по пропорциям файла (без обрезки); самые высокие ограничены высотой экрана */
+.look { --w: min(72vw, 300px); --hmax: 60vh; margin: 0; padding: 40px 0 4px; }
+@supports (height: 1svh) { .look { --hmax: 60svh; } }
 .look-head { display: grid; justify-items: center; gap: 10px; text-align: center; margin-bottom: 18px; }
 .look-head h3 {
   margin: 0; font-family: var(--serif); font-weight: 400;
@@ -256,14 +257,13 @@ a.chip { text-decoration: none; }
 .look-media { display: flex; gap: 12px; justify-content: center; }
 .look-item {
   position: relative; flex: none; min-width: 0;
-  width: min(100%, calc(var(--h) * .75)); aspect-ratio: 3 / 4;
+  width: min(100%, var(--w), calc(var(--hmax) * var(--r, .75))); aspect-ratio: 3 / 4;
   border-radius: 20px; overflow: hidden; background: var(--accent-soft);
   box-shadow: 0 30px 60px -40px rgba(43, 33, 29, .6);
   isolation: isolate;
   transition: clip-path 1.5s var(--ease) .25s, opacity 1.2s ease .25s, transform 1.4s var(--ease) .25s;
 }
-/* Все кадры одного размера 3:4; высокие фото слегка подрезаны, целиком открываются по нажатию */
-.look-item img, .look-item video { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 35%; transition: transform 1.8s var(--ease) .25s; }
+.look-item img, .look-item video { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 1.8s var(--ease) .25s; }
 .look-item .vposter, .look-item video { position: absolute; inset: 0; }
 .look-item video { opacity: 0; transition: opacity .6s ease; }
 .look-item video.is-playing { opacity: 1; }
@@ -276,8 +276,8 @@ a.chip { text-decoration: none; }
   margin: 0 -16px; padding: 0 16px; scroll-padding: 0 16px;
 }
 .look-multi .look-media::-webkit-scrollbar { display: none; }
-.look-multi .look-media { justify-content: flex-start; }
-.look-multi .look-item { width: min(72%, calc(var(--h) * .75)); scroll-snap-align: center; }
+.look-multi .look-media { justify-content: flex-start; align-items: center; }
+.look-multi .look-item { width: min(72%, var(--w), calc(var(--hmax) * var(--r, .75))); scroll-snap-align: center; }
 @keyframes lnIn { from { transform: translateY(105%); } to { transform: none; } }
 @keyframes noteIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 .look-head h3.swap .ln > span { animation: lnIn .8s var(--ease) both; animation-delay: calc(var(--k) * 70ms); }
