@@ -1,15 +1,15 @@
 /* Лендинг: одна колонка до 560px, крупный серифный шрифт, нюдовая бумага с зерном, плавное появление при прокрутке */
 :root {
-  --bg: #F8ECEE;
-  --bg-soft: #F2DFE3;
-  --surface: #FFF8F9;
+  --bg: #F9E5EA;
+  --bg-soft: #F4D6DE;
+  --surface: #FFF6F8;
   --ink: #2E2125;
   --ink-soft: #654C53;
   --muted: #A3888F;
-  --line: #ECD2D8;
+  --line: #EECAD4;
   --accent: #C48A95;
   --accent-deep: #9B5B68;
-  --accent-soft: #F3DCE1;
+  --accent-soft: #F6D4DC;
   --serif: "Cormorant Garamond", "Times New Roman", serif;
   --sans: "Manrope", -apple-system, "Segoe UI", Roboto, sans-serif;
   --ease: cubic-bezier(.2, .7, .1, 1);
@@ -81,7 +81,7 @@ em { font-style: italic; font-weight: 400; color: var(--accent-deep); }
 /* Верхняя строка */
 .topnav {
   position: sticky; top: 0; z-index: 30;
-  background: rgba(248, 236, 238, .82);
+  background: rgba(249, 229, 234, .82);
   backdrop-filter: blur(16px) saturate(1.2); -webkit-backdrop-filter: blur(16px) saturate(1.2);
   border-bottom: 1px solid transparent;
   transition: border-color .3s, background .3s;
@@ -428,7 +428,7 @@ a.chip { text-decoration: none; }
 .cta-wrap {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
   padding: 14px max(16px, env(safe-area-inset-right, 0px)) calc(14px + var(--safe-b)) max(16px, env(safe-area-inset-left, 0px));
-  background: linear-gradient(rgba(248, 236, 238, 0), var(--bg) 45%);
+  background: linear-gradient(rgba(249, 229, 234, 0), var(--bg) 45%);
   transform: translateY(110%); transition: transform .6s var(--ease);
 }
 .cta-wrap.is-shown { transform: none; }

@@ -609,10 +609,10 @@
       tg.ready();
       tg.expand();
       if (tg.isVersionAtLeast("6.1")) {
-        tg.setHeaderColor("#F8ECEE");
-        tg.setBackgroundColor("#F8ECEE");
+        tg.setHeaderColor("#F9E5EA");
+        tg.setBackgroundColor("#F9E5EA");
       }
-      if (tg.isVersionAtLeast("7.10")) tg.setBottomBarColor("#F8ECEE");
+      if (tg.isVersionAtLeast("7.10")) tg.setBottomBarColor("#F9E5EA");
       if (tg.isVersionAtLeast("7.7")) tg.disableVerticalSwipes();
     } catch (e) {}
     tg.MainButton.onClick(function () { book(); });
