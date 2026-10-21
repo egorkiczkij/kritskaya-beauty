@@ -213,7 +213,7 @@
       }).join("");
       var multi = items.length > 1;
       return '<article class="look' + (multi ? " look-multi" : "") + (cont ? " look-cont" : "") + '" data-reveal>' +
-        (cont ? "" : '<header class="look-head"><h3>' + titleWords(head0) + "</h3>" +
+        (cont ? '<div class="look-sep"><span class="look-rule"><i></i><b>✦</b><i></i></span></div>' : '<header class="look-head"><h3>' + titleWords(head0) + "</h3>" +
         '<span class="look-rule"><i></i><b>✦</b><i></i></span>' +
         '<p class="look-note"' + (note0 ? "" : " hidden") + ">" + esc(note0 || "") + "</p></header>") +
         '<div class="look-media">' + frames + "</div>" +
