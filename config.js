@@ -61,10 +61,11 @@ window.SITE = {
     {
       // Один и тот же человек: фото «Голливудская волна» и видео «До/после объёмные локоны»
       category: "hair", title: "Голливудская волна",
+      note: "Такая причёска подойдёт для более официального образа",
       media: [
         { src: "photos/work-05.jpg", ratio: "590 / 1046" },
         { video: "photos/video-02.mov", fallback: "photos/video-02.mp4", poster: "photos/cover-02.jpg", badge: "до / после", ratio: "1080 / 1920",
-          caption: "До/после: объёмные локоны", note: "Такая причёска подойдёт для более официального образа" },
+          caption: "До/после: объёмные локоны" },
         { video: "photos/video-03.mp4", poster: "photos/cover-03.jpg", ratio: "464 / 848" }
       ]
     },

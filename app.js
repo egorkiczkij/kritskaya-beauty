@@ -210,11 +210,11 @@
       // Работы подряд с одинаковым названием идут под одной надписью
       var cont = !!w.title && w.title === prevTitle && !items[0].caption;
       prevTitle = w.title;
-      var head0 = items[0].caption || w.title, note0 = items[0].note || w.note;
+      // Одно постоянное название на блок: при листании оно не меняется, страница не прыгает
+      var head0 = w.title, note0 = w.note;
       var frames = items.map(function (m) {
         var n = slides.push({ w: w, m: m, wi: x.i }) - 1;
         return '<button class="look-item' + (m.video ? " is-video" : "") + '" type="button" data-slide="' + n + '"' +
-          ' data-cap="' + esc(m.caption || w.title || "") + '" data-note="' + esc(m.note || w.note || "") + '"' +
           ' style="' + blurBg(m) + (m.ratio ? "aspect-ratio:" + esc(m.ratio) + ";--r:" + ratioNum(m.ratio) : "") + '">' +
           media(m, x.i, false, m.caption || w.title) + (m.video ? badge(m) : "") + "</button>";
       }).join("");
@@ -244,11 +244,11 @@
     }).join(" ");
   }
 
-  // При листании: точки показывают текущий кадр, а название сверху меняется на название этого кадра
+  // При листании точки показывают текущий кадр
   function bindDots(root) {
     Array.prototype.forEach.call(root.querySelectorAll(".look-multi"), function (look) {
       var row = look.querySelector(".look-media"), dots = look.querySelectorAll(".look-dots span");
-      var frames = row.querySelectorAll(".look-item"), h3 = look.querySelector(".look-head h3"), note = look.querySelector(".look-note");
+      var frames = row.querySelectorAll(".look-item");
       var cur = 0;
       // Первый кадр сразу ровно по центру
       var center = function () {
@@ -265,17 +265,7 @@
         });
         if (k === cur) return;
         Array.prototype.forEach.call(dots, function (d, j) { d.classList.toggle("on", j === k); });
-        var prev = frames[cur], next = frames[k];
         cur = k;
-        if (h3 && prev.getAttribute("data-cap") !== next.getAttribute("data-cap")) {
-          h3.innerHTML = titleWords(next.getAttribute("data-cap"));
-          h3.classList.remove("swap"); void h3.offsetWidth; h3.classList.add("swap");
-        }
-        if (note && prev.getAttribute("data-note") !== next.getAttribute("data-note")) {
-          note.textContent = next.getAttribute("data-note");
-          note.hidden = !note.textContent;
-          note.classList.remove("swap"); void note.offsetWidth; note.classList.add("swap");
-        }
       }, { passive: true });
     });
   }
