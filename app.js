@@ -443,11 +443,10 @@
       return '<div class="svc-group">' + (showHeads ? "<h3>" + esc(c.title) + "</h3>" : "") + list.map(function (x) {
         var s = x.s, on = x.i === selected;
         return '<button class="svc' + (on ? " is-selected" : "") + '" type="button" data-svc="' + x.i + '" aria-pressed="' + on + '">' +
-          '<span class="svc-title">' + esc(s.title) + "</span>" +
-          '<span class="svc-price">' + esc(s.price) + "</span>" +
-          (s.description ? '<span class="svc-desc">' + esc(s.description) + "</span>" : "") +
-          '<span class="svc-meta"><span>' + esc(s.duration || "") + "</span>" +
-          '<span class="svc-pick">' + (on ? ICONS.check + "Выбрано" : "Выбрать") + "</span></span>" +
+          '<span class="svc-row"><span class="svc-title">' + esc(s.title) + '</span><span class="svc-dots"></span>' +
+          '<span class="svc-price">' + esc(s.price) + "</span></span>" +
+          '<span class="svc-sub"><span>' + esc([s.description, s.duration].filter(Boolean).join(" · ")) + "</span>" +
+          '<span class="svc-pick">' + (on ? ICONS.check + "выбрано" : "выбрать") + "</span></span>" +
           "</button>";
       }).join("") + "</div>";
     }).join("");
@@ -593,7 +592,7 @@
   }
 
   // ---------- Верхняя строка ----------
-  $("topnav-name").textContent = S.name || "";
+  $("topnav-name").innerHTML = '<span class="mono">' + esc(initials) + '</span><span class="nm">' + esc(S.name || "") + "</span>";
   // Тень под строкой, когда страница прокручена
   var onScroll = function () { $("topnav").classList.toggle("is-scrolled", window.scrollY > 8); };
   window.addEventListener("scroll", onScroll, { passive: true });
