@@ -106,7 +106,14 @@
   var filter = "all";
   var slides = []; // все кадры видимых работ подряд, для листания в просмотре
 
-  var itemsOf = function (w) { return w.media && w.media.length ? w.media : [w]; };
+  // В блоке сначала фото, потом видео: пока смотрят фото, видео успевает загрузиться
+  var itemsOf = function (w) {
+    if (!(w.media && w.media.length)) return [w];
+    if (!w._sorted) {
+      w._sorted = w.media.filter(function (m) { return !m.video; }).concat(w.media.filter(function (m) { return m.video; }));
+    }
+    return w._sorted;
+  };
 
   // Под заголовком «Мои работы»: кнопки перехода к разделам
   function renderFilters() {
