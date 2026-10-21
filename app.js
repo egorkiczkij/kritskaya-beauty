@@ -1,0 +1,449 @@
+(function () {
+  "use strict";
+
+  var S = window.SITE || {};
+  var tg = window.Telegram && window.Telegram.WebApp;
+  // В Instagram и обычном браузере скрипт Telegram тоже грузится, но platform = "unknown"
+  var inTg = !!(tg && tg.platform && tg.platform !== "unknown");
+
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  };
+  var catTitle = function (id) {
+    var c = (S.categories || []).filter(function (x) { return x.id === id; })[0];
+    return c ? c.title : "";
+  };
+  var haptic = function (kind) {
+    try {
+      if (!inTg || !tg.HapticFeedback) return;
+      if (kind === "select") tg.HapticFeedback.selectionChanged();
+      else tg.HapticFeedback.impactOccurred(kind || "light");
+    } catch (e) {}
+  };
+
+  var ICONS = {
+    tg: '<svg viewBox="0 0 24 24"><path d="M21 4.5L3 11.2l6.3 2.3M21 4.5l-3 15-8.7-6M21 4.5L9.3 13.5v5.3l3.2-3.3"/></svg>',
+    ig: '<svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".6"/></svg>',
+    wa: '<svg viewBox="0 0 24 24"><path d="M4 20l1.2-4A8.5 8.5 0 1 1 8.4 19z"/><path d="M9 8.5c0 3.5 3 6.5 6.5 6.5l1-1.6-2-1-1 .9a5 5 0 0 1-2.3-2.3l.9-1-1-2z"/></svg>',
+    phone: '<svg viewBox="0 0 24 24"><path d="M6.5 3.5h3l1.5 4-2 1.3a10 10 0 0 0 6.2 6.2l1.3-2 4 1.5v3a2 2 0 0 1-2 2A16 16 0 0 1 4.5 5.5a2 2 0 0 1 2-2z"/></svg>',
+    arrow: '<svg class="arrow" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>',
+    check: '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'
+  };
+
+  // Мягкие градиенты для заглушек, пока нет фото
+  var PH = [
+    "linear-gradient(160deg,#E7CDBB,#C99B7F)",
+    "linear-gradient(160deg,#EFDCD0,#D3AE98)",
+    "linear-gradient(160deg,#DCC3B4,#B48A74)",
+    "linear-gradient(160deg,#F0E1D6,#D8B9A5)"
+  ];
+  var RATIOS = ["3 / 4", "4 / 5", "2 / 3", "1 / 1", "4 / 5", "3 / 4"];
+  function placeholder(i, work) {
+    return '<div class="ph" style="background:' + PH[i % PH.length] + ";aspect-ratio:" + RATIOS[i % RATIOS.length] + '">' +
+      '<span class="ph-mark">' + esc(catTitle(work.category) || "Образ") + "</span>" +
+      '<span class="ph-sub">фото скоро</span></div>';
+  }
+
+  // ---------- Шапка ----------
+  document.title = (S.name ? S.name + " · " : "") + "визаж и причёски";
+  // Имя по буквам: каждая буква проявляется с небольшой задержкой
+  (function () {
+    var i = 0;
+    $("name").innerHTML = (S.name || "").split(" ").map(function (word) {
+      return '<span class="w">' + word.split("").map(function (ch) {
+        return '<span class="l" style="--i:' + (i++) + '">' + esc(ch) + "</span>";
+      }).join("") + "</span>";
+    }).join(" ");
+    $("name").setAttribute("aria-label", S.name || "");
+  })();
+  $("role").textContent = [S.role, S.city].filter(Boolean).join(" · ");
+  $("tagline").textContent = S.tagline || "";
+  var initials = (S.name || "").split(" ").map(function (w) { return w.charAt(0); }).join("").slice(0, 2);
+  $("avatar").textContent = initials;
+  if (S.avatar) {
+    var av = new Image();
+    av.alt = S.name || "";
+    av.onload = function () {
+      var box = $("avatar");
+      box.textContent = "";
+      box.style.aspectRatio = av.naturalWidth + " / " + av.naturalHeight;
+      box.appendChild(av);
+    };
+    av.src = S.avatar;
+  }
+  $("stats").hidden = !(S.stats || []).length;
+  $("stats").innerHTML = (S.stats || []).map(function (s) {
+    return "<li><b>" + esc(s.value) + "</b><span>" + esc(s.label) + "</span></li>";
+  }).join("");
+
+  // ---------- Появление при прокрутке ----------
+  var io = null;
+  if ("IntersectionObserver" in window && !(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)) {
+    document.documentElement.classList.add("reveal-on");
+    io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); }
+      });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+  }
+  function reveal(root) {
+    var els = root.matches && root.matches("[data-reveal]") ? [root] : root.querySelectorAll("[data-reveal]");
+    Array.prototype.forEach.call(els, function (el) {
+      if (io) io.observe(el); else el.classList.add("is-in");
+    });
+  }
+
+  // ---------- Портфолио ----------
+  var works = S.works || [];
+  var filter = "all";
+  var visible = [];
+
+  function renderFilters() {
+    // Показываем только разделы, где уже есть работы
+    var used = (S.categories || []).filter(function (c) {
+      return works.some(function (w) { return w.category === c.id; });
+    });
+    $("filters").hidden = used.length < 2;
+    var items = [{ id: "all", title: "Все" }].concat(used);
+    $("filters").innerHTML = items.map(function (c) {
+      return '<button class="chip' + (c.id === filter ? " is-active" : "") + '" data-filter="' + esc(c.id) + '" type="button" role="tab">' + esc(c.title) + "</button>";
+    }).join("");
+  }
+
+  var badge = function (w) {
+    return '<span class="tile-badge"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10-6.5z"/></svg>' + esc(w.badge || "видео") + "</span>";
+  };
+  function media(w, i, inLightbox) {
+    if (w.video) {
+      return '<video src="' + esc(w.video) + '"' + (w.poster ? ' poster="' + esc(w.poster) + '"' : "") +
+        ' muted loop playsinline autoplay preload="' + (inLightbox ? "auto" : "metadata") + '"' +
+        (inLightbox ? " controls" : "") + "></video>";
+    }
+    if (w.src) {
+      return '<img src="' + esc(w.src) + '" alt="' + esc(w.title) + '"' + (inLightbox ? "" : ' loading="lazy"') + ' data-ph="' + i + '">';
+    }
+    return placeholder(i, w);
+  }
+
+  function renderGallery() {
+    visible = works.map(function (w, i) { return { w: w, i: i }; })
+      .filter(function (x) { return filter === "all" || x.w.category === filter; });
+    $("works-count").textContent = visible.length ? visible.length + " " + plural(visible.length, ["работа", "работы", "работ"]) : "";
+    $("gallery").innerHTML = visible.map(function (x, pos) {
+      var w = x.w;
+      var inner = media(w, x.i, false) + (w.video ? badge(w) : "");
+      return '<button class="tile" type="button" data-reveal data-pos="' + pos + '" style="--d:' + (pos % 2) * 120 + 'ms">' +
+        inner + (w.title ? '<span class="tile-caption">' + esc(w.title) + "</span>" : "") + "</button>";
+    }).join("");
+    attachFallbacks($("gallery"));
+    reveal($("gallery"));
+  }
+
+  // Если файла ещё нет, ставим заглушку
+  function attachFallbacks(root) {
+    Array.prototype.forEach.call(root.querySelectorAll("img[data-ph]"), function (img) {
+      var swap = function () {
+        var i = +img.getAttribute("data-ph");
+        var tmp = document.createElement("div");
+        tmp.innerHTML = placeholder(i, works[i]);
+        if (img.parentNode) img.parentNode.replaceChild(tmp.firstChild, img);
+      };
+      if (img.complete && img.naturalWidth === 0) swap();
+      else img.addEventListener("error", swap);
+    });
+  }
+
+  function plural(n, f) {
+    var m10 = n % 10, m100 = n % 100;
+    if (m10 === 1 && m100 !== 11) return f[0];
+    if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return f[1];
+    return f[2];
+  }
+
+  $("filters").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-filter]");
+    if (!b || b.getAttribute("data-filter") === filter) return;
+    filter = b.getAttribute("data-filter");
+    haptic("select");
+    renderFilters();
+    renderGallery();
+  });
+
+  // ---------- Просмотр фото ----------
+  var lbPos = -1;
+  function openLightbox(pos) {
+    lbPos = pos;
+    var x = visible[pos];
+    if (!x) return;
+    var stage = $("lb-stage");
+    stage.innerHTML = media(x.w, x.i, true);
+    // Открыли по нажатию, поэтому пробуем со звуком; если браузер запретит, играем без звука
+    var v = stage.querySelector("video");
+    if (v) {
+      v.muted = false;
+      var pr = v.play();
+      if (pr && pr.catch) pr.catch(function () { v.muted = true; v.play(); });
+    }
+    attachFallbacks(stage);
+    $("lb-title").textContent = x.w.title || catTitle(x.w.category);
+    $("lb-counter").textContent = (pos + 1) + " из " + visible.length;
+    if ($("lightbox").hidden) {
+      $("lightbox").hidden = false;
+      document.body.style.overflow = "hidden";
+      if (inTg) {
+        tg.MainButton.hide();
+        tg.BackButton.show();
+      }
+    }
+  }
+  function closeLightbox() {
+    $("lightbox").hidden = true;
+    $("lb-stage").innerHTML = "";
+    document.body.style.overflow = "";
+    lbPos = -1;
+    if (inTg) {
+      tg.BackButton.hide();
+      updateCta();
+    }
+  }
+  function stepLightbox(d) {
+    if (!visible.length) return;
+    haptic("select");
+    openLightbox((lbPos + d + visible.length) % visible.length);
+  }
+
+  $("gallery").addEventListener("click", function (e) {
+    var t = e.target.closest(".tile");
+    if (!t) return;
+    haptic("light");
+    openLightbox(+t.getAttribute("data-pos"));
+  });
+  $("lb-close").addEventListener("click", closeLightbox);
+  $("lb-book").addEventListener("click", function () {
+    var w = visible[lbPos] && visible[lbPos].w;
+    book(w ? "Здравствуйте! Понравилась ваша работа «" + (w.title || catTitle(w.category)) +
+      "», хочу похожий образ. Подскажите, пожалуйста, свободные даты." : null, w && w.title);
+  });
+  (function swipe() {
+    var sx = 0, sy = 0;
+    var stage = $("lb-stage");
+    stage.addEventListener("touchstart", function (e) { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+    stage.addEventListener("touchend", function (e) {
+      var dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) stepLightbox(dx < 0 ? 1 : -1);
+      else if (dy > 90 && Math.abs(dy) > Math.abs(dx)) closeLightbox();
+    });
+    stage.addEventListener("click", function (e) {
+      if (e.target === stage) closeLightbox();
+    });
+  })();
+  document.addEventListener("keydown", function (e) {
+    if ($("lightbox").hidden) return;
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowRight") stepLightbox(1);
+    if (e.key === "ArrowLeft") stepLightbox(-1);
+  });
+
+  // ---------- Услуги ----------
+  var services = S.services || [];
+  var selected = -1;
+
+  function renderServices() {
+    var byCat = (S.categories || []).map(function (c) {
+      return {
+        c: c,
+        list: services.map(function (s, i) { return { s: s, i: i }; })
+          .filter(function (x) { return x.s.category === c.id; })
+      };
+    });
+    // Заголовки групп нужны, только если хоть в одной группе больше одной услуги
+    var showHeads = byCat.some(function (g) { return g.list.length > 1; });
+    var groups = byCat.map(function (g) {
+      var c = g.c, list = g.list;
+      if (!list.length) return "";
+      return '<div class="svc-group">' + (showHeads ? "<h3>" + esc(c.title) + "</h3>" : "") + list.map(function (x) {
+        var s = x.s, on = x.i === selected;
+        return '<button class="svc' + (on ? " is-selected" : "") + '" type="button" data-svc="' + x.i + '" aria-pressed="' + on + '">' +
+          '<span class="svc-title">' + esc(s.title) + "</span>" +
+          '<span class="svc-price">' + esc(s.price) + "</span>" +
+          (s.description ? '<span class="svc-desc">' + esc(s.description) + "</span>" : "") +
+          '<span class="svc-meta"><span>' + esc(s.duration || "") + "</span>" +
+          '<span class="svc-pick">' + (on ? ICONS.check + "Выбрано" : "Выбрать") + "</span></span>" +
+          "</button>";
+      }).join("") + "</div>";
+    }).join("");
+    $("services").innerHTML = groups;
+    $("notes").innerHTML = (S.notes || []).map(function (n) { return "<li>" + esc(n) + "</li>"; }).join("");
+    $("notes").hidden = !(S.notes || []).length;
+  }
+
+  $("services").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-svc]");
+    if (!b) return;
+    var i = +b.getAttribute("data-svc");
+    selected = selected === i ? -1 : i;
+    haptic("select");
+    renderServices();
+    updateCta();
+  });
+
+  // ---------- Обо мне ----------
+  function tgLink(text) {
+    return "https://t.me/" + encodeURIComponent(S.telegram) + (text ? "?text=" + encodeURIComponent(text) : "");
+  }
+  function waLink(text) {
+    return "https://wa.me/" + String(S.whatsapp).replace(/\D/g, "") + (text ? "?text=" + encodeURIComponent(text) : "");
+  }
+  function contactRow(href, icon, title, sub, attrs) {
+    return '<a class="contact" href="' + esc(href) + '" ' + (attrs || "") + ">" + icon +
+      "<span>" + esc(title) + (sub ? "<small>" + esc(sub) + "</small>" : "") + "</span>" + ICONS.arrow + "</a>";
+  }
+
+  function renderAbout() {
+    $("about").textContent = S.about || "";
+    $("steps").innerHTML = (S.steps || []).map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("");
+    var rows = [];
+    if (S.telegram) rows.push(contactRow(tgLink(), ICONS.tg, "Telegram", "@" + S.telegram, 'data-tg="1" target="_blank" rel="noopener"'));
+    if (S.instagram) rows.push(contactRow("https://instagram.com/" + S.instagram, ICONS.ig, "Instagram", "@" + S.instagram, 'target="_blank" rel="noopener"'));
+    if (S.whatsapp) rows.push(contactRow(waLink(), ICONS.wa, "WhatsApp", S.whatsapp, 'target="_blank" rel="noopener"'));
+    if (S.phone) rows.push(contactRow("tel:" + S.phone.replace(/[^\d+]/g, ""), ICONS.phone, "Позвонить", S.phone));
+    $("contacts").innerHTML = rows.join("");
+    $("address").textContent = S.address || "";
+  }
+
+  // Внутри Telegram ссылки t.me открываем его методом, иначе приложение может открыть их во встроенном браузере
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest("a[href^='https://t.me/']");
+    if (!a || !inTg) return;
+    e.preventDefault();
+    tg.openTelegramLink(a.href);
+  });
+
+  // ---------- Запись ----------
+  function defaultMessage() {
+    if (selected >= 0) {
+      var s = services[selected];
+      return "Здравствуйте! Хочу записаться на «" + s.title + "» (" + s.price + "). Подскажите, пожалуйста, свободные даты.";
+    }
+    return "Здравствуйте! Хочу записаться. Подскажите, пожалуйста, свободные даты.";
+  }
+
+  function copy(text) {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).catch(function () { legacyCopy(text); });
+        return;
+      }
+    } catch (e) {}
+    legacyCopy(text);
+  }
+  function legacyCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.cssText = "position:fixed;top:-1000px;opacity:0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  function toast(msg) {
+    var t = $("toast");
+    t.textContent = msg;
+    t.hidden = false;
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function () { t.hidden = true; }, 2200);
+  }
+
+  function book(message, label) {
+    var text = message || defaultMessage();
+    haptic("medium");
+    if (inTg && S.telegram) {
+      tg.openTelegramLink(tgLink(text));
+      return;
+    }
+    // Instagram, Safari, Chrome: даём выбрать мессенджер, текст копируем заранее
+    copy(text);
+    var rows = [];
+    if (S.telegram) rows.push(contactRow(tgLink(text), ICONS.tg, "Написать в Telegram", "сообщение подставится само", 'target="_blank" rel="noopener"'));
+    if (S.whatsapp) rows.push(contactRow(waLink(text), ICONS.wa, "Написать в WhatsApp", "сообщение подставится само", 'target="_blank" rel="noopener"'));
+    if (S.instagram) rows.push(contactRow("https://ig.me/m/" + S.instagram, ICONS.ig, "Написать в Direct", "вставьте скопированный текст", 'target="_blank" rel="noopener"'));
+    if (S.phone) rows.push(contactRow("tel:" + S.phone.replace(/[^\d+]/g, ""), ICONS.phone, "Позвонить", S.phone));
+    $("sheet-actions").innerHTML = rows.join("");
+    var svc = label || (selected >= 0 ? services[selected].title + " · " + services[selected].price : "");
+    $("sheet-service").textContent = svc;
+    $("sheet-service").hidden = !svc;
+    $("sheet").hidden = false;
+  }
+
+  $("sheet").addEventListener("click", function (e) {
+    if (e.target.closest("[data-close]") || e.target.closest(".contact")) $("sheet").hidden = true;
+  });
+
+  function ctaText() {
+    return selected >= 0 ? "Записаться · " + services[selected].title : "Записаться";
+  }
+  function updateCta() {
+    $("cta").textContent = ctaText();
+    if (inTg && $("lightbox").hidden) {
+      tg.MainButton.setParams({ text: ctaText(), color: "#2E2420", text_color: "#FFFBF7", is_visible: true });
+    }
+  }
+  $("cta").addEventListener("click", function () { book(); });
+
+  // ---------- Шапка: цены, бегущая строка, подвал ----------
+  $("hero-prices").innerHTML = (S.services || []).map(function (s) {
+    return "<span>" + esc(s.title) + "<b>" + esc(s.price) + "</b></span>";
+  }).join("");
+  (function () {
+    var words = (S.categories || []).map(function (c) { return c.title; }).concat(S.city ? [S.city] : []);
+    var row = words.map(function (w) { return "<span>" + esc(w) + "</span>"; }).join("");
+    $("marquee").innerHTML = row + row + row + row; // дважды по два, чтобы лента шла без шва
+  })();
+  $("foot").textContent = "© " + new Date().getFullYear() + " " + (S.name || "") + (S.city ? " · " + S.city : "");
+  $("hero-book").addEventListener("click", function () { book(); });
+
+  // Плавающая кнопка появляется, когда кнопка в шапке ушла с экрана
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(function (es) {
+      $("cta-wrap").classList.toggle("is-shown", !es[0].isIntersecting && es[0].boundingClientRect.top < 0);
+    }).observe($("hero-book"));
+  } else {
+    $("cta-wrap").classList.add("is-shown");
+  }
+
+  // ---------- Верхняя строка ----------
+  $("topnav-name").textContent = S.name || "";
+  // Тень под строкой, когда страница прокручена
+  var onScroll = function () { $("topnav").classList.toggle("is-scrolled", window.scrollY > 8); };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
+  // ---------- Telegram ----------
+  if (inTg) {
+    document.body.classList.add("in-tg");
+    try {
+      tg.ready();
+      tg.expand();
+      if (tg.isVersionAtLeast("6.1")) {
+        tg.setHeaderColor("#F6EFE8");
+        tg.setBackgroundColor("#F6EFE8");
+      }
+      if (tg.isVersionAtLeast("7.10")) tg.setBottomBarColor("#F6EFE8");
+      if (tg.isVersionAtLeast("7.7")) tg.disableVerticalSwipes();
+    } catch (e) {}
+    tg.MainButton.onClick(function () { book(); });
+    tg.BackButton.onClick(closeLightbox);
+  }
+
+  reveal(document);
+  renderFilters();
+  renderGallery();
+  renderServices();
+  renderAbout();
+  updateCta();
+})();
