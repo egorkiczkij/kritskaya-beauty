@@ -38,10 +38,10 @@
 
   // Мягкие градиенты для заглушек, пока нет фото
   var PH = [
-    "linear-gradient(160deg,#E7CDBB,#C99B7F)",
-    "linear-gradient(160deg,#EFDCD0,#D3AE98)",
-    "linear-gradient(160deg,#DCC3B4,#B48A74)",
-    "linear-gradient(160deg,#F0E1D6,#D8B9A5)"
+    "linear-gradient(160deg,#F0D3DA,#D3A0AC)",
+    "linear-gradient(160deg,#F5E0E5,#DDB2BC)",
+    "linear-gradient(160deg,#E8C9D0,#C08A96)",
+    "linear-gradient(160deg,#F7E6EA,#E1BCC5)"
   ];
   var RATIOS = ["3 / 4", "4 / 5", "2 / 3", "1 / 1", "4 / 5", "3 / 4"];
   function placeholder(i, work) {
@@ -566,7 +566,7 @@
   function updateCta() {
     $("cta").textContent = ctaText();
     if (inTg && $("lightbox").hidden) {
-      tg.MainButton.setParams({ text: ctaText(), color: "#2E2420", text_color: "#FFFBF7", is_visible: true });
+      tg.MainButton.setParams({ text: ctaText(), color: "#2E2125", text_color: "#FFF8F9", is_visible: true });
     }
   }
   $("cta").addEventListener("click", function () { book(); });
@@ -609,10 +609,10 @@
       tg.ready();
       tg.expand();
       if (tg.isVersionAtLeast("6.1")) {
-        tg.setHeaderColor("#F6EFE8");
-        tg.setBackgroundColor("#F6EFE8");
+        tg.setHeaderColor("#F8ECEE");
+        tg.setBackgroundColor("#F8ECEE");
       }
-      if (tg.isVersionAtLeast("7.10")) tg.setBottomBarColor("#F6EFE8");
+      if (tg.isVersionAtLeast("7.10")) tg.setBottomBarColor("#F8ECEE");
       if (tg.isVersionAtLeast("7.7")) tg.disableVerticalSwipes();
     } catch (e) {}
     tg.MainButton.onClick(function () { book(); });
