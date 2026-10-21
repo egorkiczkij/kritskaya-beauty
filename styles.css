@@ -27,7 +27,7 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--sans);
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
@@ -53,7 +53,7 @@ body.in-tg #app { padding-bottom: var(--safe-b); }
 
 .eyebrow {
   margin: 0;
-  font-size: 11px; font-weight: 500; letter-spacing: .24em; text-transform: uppercase;
+  font-size: 12px; font-weight: 500; letter-spacing: .24em; text-transform: uppercase;
   color: var(--accent-deep);
 }
 em { font-style: italic; font-weight: 400; color: var(--accent-deep); }
@@ -161,7 +161,7 @@ em { font-style: italic; font-weight: 400; color: var(--accent-deep); }
   margin: 34px 0 0;
   animation: rise 1s var(--ease) 1.4s both;
 }
-.hero-prices span { font-size: 13px; color: var(--muted); }
+.hero-prices span { font-size: 14.5px; color: var(--ink-soft); }
 .hero-prices b { font-family: var(--serif); font-size: 21px; font-weight: 500; color: var(--ink); margin-left: 4px; }
 .hero-actions {
   display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
@@ -199,7 +199,7 @@ em { font-style: italic; font-weight: 400; color: var(--accent-deep); }
 }
 .sec-head-sub { margin-top: 48px; }
 .count { position: absolute; right: 0; top: 0; font-size: 12px; color: var(--muted); letter-spacing: .04em; }
-.hint { margin: -6px auto 22px; font-size: 13px; color: var(--muted); max-width: 46ch; text-align: center; }
+.hint { margin: -6px auto 22px; font-size: 15px; line-height: 1.5; color: var(--muted); max-width: 46ch; text-align: center; }
 
 /* Появление при прокрутке: работает, только если скрипт поставил html.reveal-on */
 .reveal-on [data-reveal] { opacity: 0; transform: translateY(28px); transition: opacity 1s var(--ease), transform 1s var(--ease); transition-delay: var(--d, 0ms); }
@@ -384,15 +384,15 @@ a.chip { text-decoration: none; }
 .svc.is-selected .svc-title { color: var(--accent-deep); }
 .svc-dots { flex: 1; min-width: 20px; border-bottom: 1px dotted var(--gold); transform: translateY(-6px); }
 .svc-price { font-family: var(--serif); font-size: 27px; font-weight: 400; white-space: nowrap; color: var(--ink); font-variant-numeric: lining-nums; }
-.svc-sub { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--muted); }
+.svc-sub { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 15px; line-height: 1.45; color: var(--ink-soft); }
 .svc-pick {
   flex: none; display: inline-flex; align-items: center; gap: 5px;
-  font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent-deep);
+  font-size: 11.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent-deep);
 }
 .svc.is-selected .svc-pick { color: var(--gold); }
 .svc-pick svg { width: 12px; height: 12px; stroke-width: 2; }
 .notes { list-style: none; padding: 0; margin: 18px 0 0; text-align: center; }
-.notes li { font-size: 13px; color: var(--muted); padding: 3px 0 3px 16px; position: relative; }
+.notes li { font-size: 15px; color: var(--ink-soft); padding: 3px 0 3px 16px; position: relative; }
 .notes li { padding-left: 0; }
 .notes li::before { content: "✦"; position: static; margin-right: 8px; font-size: 10px; color: var(--gold); }
 
@@ -401,7 +401,7 @@ a.chip { text-decoration: none; }
 .steps { list-style: none; padding: 0; margin: 0; counter-reset: s; display: grid; }
 .steps li {
   counter-increment: s; position: relative;
-  padding: 18px 0 18px 64px; font-size: 15px; color: var(--ink-soft);
+  padding: 18px 0 18px 64px; font-size: 16px; color: var(--ink-soft);
   border-top: 1px solid var(--line);
 }
 .steps li:last-child { border-bottom: 1px solid var(--line); }
@@ -420,18 +420,18 @@ a.chip { text-decoration: none; }
   display: flex; align-items: center; gap: 14px;
   padding: 16px 18px; border-radius: 16px;
   background: var(--surface); border: 1px solid var(--line);
-  color: var(--ink); text-decoration: none; font-size: 15px;
+  color: var(--ink); text-decoration: none; font-size: 16.5px;
   transition: border-color .3s, transform .2s var(--ease);
 }
 .contact:active { transform: scale(.985); border-color: var(--accent); }
 .contact svg { width: 22px; height: 22px; color: var(--accent-deep); flex: none; }
-.contact small { display: block; font-size: 12px; color: var(--muted); }
+.contact small { display: block; font-size: 14px; color: var(--muted); }
 .contact .arrow { margin-left: auto; width: 16px; height: 16px; color: var(--muted); }
-.address { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+.address { margin: 8px 0 0; font-size: 15px; color: var(--ink-soft); }
 .foot {
   margin: 56px auto 0; padding: 22px 16px 0; max-width: 560px;
   border-top: 1px solid var(--line); text-align: center;
-  font-size: 12px; color: var(--muted); letter-spacing: .04em;
+  font-size: 13.5px; color: var(--muted); letter-spacing: .04em;
 }
 
 /* Плавающая кнопка записи: появляется, когда кнопка в шапке ушла с экрана */
@@ -465,7 +465,7 @@ body.in-tg .cta-wrap { display: none; }
 @keyframes zoomIn { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: none; } }
 .lb-bottom { padding: 8px 16px calc(16px + var(--safe-b)); text-align: center; color: #fff; display: grid; justify-items: center; }
 .lb-title { margin: 0; font-family: var(--serif); font-size: 26px; }
-.lb-counter { margin: 2px 0 14px; font-size: 12px; color: rgba(255, 255, 255, .55); }
+.lb-counter { margin: 2px 0 14px; font-size: 13.5px; color: rgba(255, 255, 255, .55); }
 
 /* Выбор способа связи */
 .sheet { position: fixed; inset: 0; z-index: 60; display: flex; align-items: flex-end; justify-content: center; }
@@ -480,10 +480,10 @@ body.in-tg .cta-wrap { display: none; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 .sheet-grip { width: 40px; height: 4px; border-radius: 4px; background: var(--line); margin: 0 auto 16px; }
 .sheet-title { margin: 0; text-align: center; font-family: var(--serif); font-weight: 400; font-size: 30px; }
-.sheet-service { margin: 4px 0 16px; text-align: center; font-size: 13px; color: var(--muted); }
+.sheet-service { margin: 4px 0 16px; text-align: center; font-size: 15px; color: var(--muted); }
 .sheet-actions { display: grid; gap: 8px; }
 .sheet-actions .contact { background: var(--bg); }
-.sheet-note { margin: 14px 0 6px; text-align: center; font-size: 12px; color: var(--muted); }
+.sheet-note { margin: 14px 0 6px; text-align: center; font-size: 13.5px; color: var(--muted); }
 .sheet-cancel { display: block; width: 100%; padding: 12px; font-size: 14px; color: var(--ink-soft); }
 
 .toast {

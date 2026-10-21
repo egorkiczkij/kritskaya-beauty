@@ -12,8 +12,23 @@
   <meta property="og:description" content="Портфолио, цены и запись в пару касаний">
   <meta property="og:image" content="https://egorkiczkij.github.io/kritskaya-beauty/photos/cover.jpg">
   <link rel="stylesheet" href="fonts/fonts.css">
+  <meta name="build" content="1792608636">
+  <script>
+    // Браузер Telegram держит старую копию сайта до 10 минут. Проверяем номер свежей версии и обновляемся.
+    (function () {
+      try {
+        var cur = document.querySelector('meta[name="build"]').content;
+        fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.text() : ""; }).then(function (v) {
+          v = (v || "").trim();
+          if (!v || v === cur || sessionStorage.getItem("kb-reloaded") === v) return;
+          sessionStorage.setItem("kb-reloaded", v);
+          location.replace(location.pathname + "?v=" + v + location.hash);
+        }).catch(function () {});
+      } catch (e) {}
+    })();
+  </script>
   <link rel="preload" as="image" href="photos/s/avatar.webp" fetchpriority="high">
-  <link rel="stylesheet" href="styles.css?v=1792608551">
+  <link rel="stylesheet" href="styles.css?v=1792608636">
 </head>
 <body>
   <nav class="topnav" id="topnav" aria-label="Разделы">
@@ -128,8 +143,8 @@
     </div>
   </div>
 
-  <script src="photos/s/thumbs.js?v=1792608551" defer></script>
-  <script src="config.js?v=1792608551" defer></script>
-  <script src="app.js?v=1792608551" defer></script>
+  <script src="photos/s/thumbs.js?v=1792608636" defer></script>
+  <script src="config.js?v=1792608636" defer></script>
+  <script src="app.js?v=1792608636" defer></script>
 </body>
 </html>
