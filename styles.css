@@ -234,8 +234,8 @@ a.chip { text-decoration: none; }
 
 /* Образ: название по центру, линия, кадры. Анимация срабатывает, когда блок появляется на экране */
 /* Высота кадра: так, чтобы название и фото помещались на одном экране телефона */
-.look { --h: min(52vh, 460px); margin: 0; padding: 40px 0 4px; }
-@supports (height: 1svh) { .look { --h: min(52svh, 460px); } }
+.look { --h: min(44vh, 390px); margin: 0; padding: 40px 0 4px; }
+@supports (height: 1svh) { .look { --h: min(44svh, 390px); } }
 .look-head { display: grid; justify-items: center; gap: 10px; text-align: center; margin-bottom: 18px; }
 .look-head h3 {
   margin: 0; font-family: var(--serif); font-weight: 400;
@@ -275,7 +275,7 @@ a.chip { text-decoration: none; }
 }
 .look-multi .look-media::-webkit-scrollbar { display: none; }
 .look-multi .look-media { justify-content: flex-start; }
-.look-multi .look-item { width: min(84%, calc(var(--h) * var(--r, .75))); scroll-snap-align: center; }
+.look-multi .look-item { width: min(72%, calc(var(--h) * var(--r, .75))); scroll-snap-align: center; }
 @keyframes lnIn { from { transform: translateY(105%); } to { transform: none; } }
 @keyframes noteIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 .look-head h3.swap .ln > span { animation: lnIn .8s var(--ease) both; animation-delay: calc(var(--k) * 70ms); }

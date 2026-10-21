@@ -40,3 +40,7 @@
 В шапку профиля ставьте адрес сайта `https://egorkiczkij.github.io/kritskaya-beauty/`, а не ссылку на бота. Ссылка `t.me/...` из Instagram сначала откроет страницу Telegram, а у кого Telegram нет, портфолио не увидят вовсе.
 
 [@BotFather]: https://t.me/BotFather
+
+## Обновления сразу видны
+
+В `index.html` у `styles.css`, `config.js` и `app.js` стоит `?v=число`. Я меняю это число при каждом обновлении, чтобы телефоны не показывали старую версию из памяти.
