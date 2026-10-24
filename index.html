@@ -2,149 +2,24 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#F9E5EA">
-  <title>Мария Крицкая · визаж и причёски</title>
-  <meta name="description" content="Макияж и причёски в Омске: портфолио, цены и запись в Telegram">
-  <!-- Превью ссылки в Instagram и мессенджерах. Если адрес сайта поменяется, поменяйте и ссылку в og:image. -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Мария Крицкая · визаж и причёски, Омск">
-  <meta property="og:description" content="Портфолио, цены и запись в пару касаний">
-  <meta property="og:image" content="https://egorkiczkij.github.io/kritskaya-beauty/photos/cover.jpg">
-  <link rel="stylesheet" href="fonts/fonts.css">
-  <meta name="build" content="1792609382">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Мария Крицкая · сайт переехал</title>
+  <link rel="canonical" href="https://kritskayabeauty.github.io/">
+  <meta http-equiv="refresh" content="0; url=https://kritskayabeauty.github.io/">
   <script>
-    // Браузер Telegram держит старую копию сайта до 10 минут. Проверяем номер свежей версии и обновляемся.
+    // Старый адрес: переходим на ту же страницу на новом сайте
     (function () {
-      try {
-        var cur = document.querySelector('meta[name="build"]').content;
-        fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.text() : ""; }).then(function (v) {
-          v = (v || "").trim();
-          if (!v || v === cur || sessionStorage.getItem("kb-reloaded") === v) return;
-          sessionStorage.setItem("kb-reloaded", v);
-          location.replace(location.pathname + "?v=" + v + location.hash);
-        }).catch(function () {});
-      } catch (e) {}
+      var path = location.pathname.replace(/^\/kritskaya-beauty/, "") || "/";
+      location.replace("https://kritskayabeauty.github.io" + path + location.search + location.hash);
     })();
   </script>
-  <link rel="preload" as="image" href="photos/s/avatar.webp" fetchpriority="high">
-  <link rel="stylesheet" href="styles.css?v=1792609382">
+  <style>
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #F9E5EA; color: #2E2125;
+      font-family: Georgia, serif; text-align: center; padding: 16px; }
+    a { color: #9B5B68; }
+  </style>
 </head>
 <body>
-  <nav class="topnav" id="topnav" aria-label="Разделы">
-    <div class="topnav-in">
-      <a class="topnav-name" href="#top" id="topnav-name"></a>
-      <div class="topnav-links">
-        <a href="#portfolio">Работы</a>
-        <a href="#prices">Цены</a>
-        <a href="#contact">Контакты</a>
-      </div>
-    </div>
-  </nav>
-
-  <header class="hero" id="top">
-    <div class="wrap hero-in">
-      <p class="eyebrow hero-eyebrow" id="role"></p>
-      <h1 class="hero-name" id="name"></h1>
-      <p class="hero-tagline" id="tagline"></p>
-      <figure class="hero-photo" id="hero-photo">
-        <div class="avatar" id="avatar"></div>
-      </figure>
-      <div class="hero-prices" id="hero-prices"></div>
-      <div class="hero-actions">
-        <button class="btn btn-dark" id="hero-book" type="button">Записаться</button>
-        <a class="btn btn-ghost" href="#portfolio">Смотреть работы</a>
-      </div>
-      <ul class="stats" id="stats"></ul>
-    </div>
-  </header>
-
-  <div class="marquee" aria-hidden="true"><div class="marquee-track" id="marquee"></div></div>
-
-  <main id="app">
-    <section class="sec" id="portfolio">
-      <div class="wrap">
-        <div class="sec-head" data-reveal>
-          <p class="eyebrow">Портфолио</p>
-          <h2>Мои <em>работы</em></h2>
-        </div>
-        <div class="chips" id="filters" role="tablist" data-reveal></div>
-        <div class="gallery" id="gallery"></div>
-      </div>
-    </section>
-
-    <section class="sec sec-soft" id="prices">
-      <div class="wrap">
-        <div class="sec-head" data-reveal>
-          <p class="eyebrow">Услуги</p>
-          <h2>Услуги и <em>цены</em></h2>
-        </div>
-        <p class="hint" data-reveal>Выберите услугу и нажмите «Записаться»: откроется чат с готовым сообщением.</p>
-        <div id="services" data-reveal></div>
-        <ul class="notes" id="notes"></ul>
-      </div>
-    </section>
-
-    <section class="sec" id="info">
-      <div class="wrap">
-        <div class="sec-head" data-reveal>
-          <p class="eyebrow">Обо мне</p>
-          <h2>Привет, я <em>Мария</em></h2>
-        </div>
-        <p class="about" id="about" data-reveal></p>
-        <div class="sec-head sec-head-sub" data-reveal>
-          <p class="eyebrow">Запись</p>
-          <h2>Как <em>записаться</em></h2>
-        </div>
-        <ol class="steps" id="steps" data-reveal></ol>
-      </div>
-    </section>
-
-    <section class="sec sec-final" id="contact">
-      <div class="wrap">
-        <div class="final" data-reveal>
-          <p class="eyebrow">Контакты</p>
-          <h2>Жду вас <em>на образ</em></h2>
-          <div class="contacts" id="contacts"></div>
-          <p class="address" id="address"></p>
-        </div>
-      </div>
-      <footer class="foot" id="foot"></footer>
-    </section>
-  </main>
-
-  <div class="cta-wrap" id="cta-wrap">
-    <button class="btn btn-dark cta" id="cta" type="button">Записаться</button>
-  </div>
-
-  <div class="lightbox" id="lightbox" hidden>
-    <button class="lb-close" id="lb-close" type="button" aria-label="Закрыть">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
-    </button>
-    <div class="lb-stage" id="lb-stage"></div>
-    <div class="lb-bottom">
-      <p class="lb-title" id="lb-title"></p>
-      <p class="lb-counter" id="lb-counter"></p>
-      <button class="btn btn-light" id="lb-book" type="button">Хочу такой образ</button>
-    </div>
-  </div>
-
-  <div class="toast" id="toast" hidden></div>
-
-  <div class="sheet" id="sheet" hidden>
-    <div class="sheet-backdrop" data-close></div>
-    <div class="sheet-panel" role="dialog" aria-labelledby="sheet-title">
-      <div class="sheet-grip"></div>
-      <h3 class="sheet-title" id="sheet-title">Как удобнее записаться?</h3>
-      <p class="sheet-service" id="sheet-service"></p>
-      <div class="sheet-actions" id="sheet-actions"></div>
-      <p class="sheet-note">Текст заявки скопирован: вставьте его в чат, если он не появился сам.</p>
-      <button class="sheet-cancel" type="button" data-close>Отмена</button>
-    </div>
-  </div>
-
-  <script src="photos/s/thumbs.js?v=1792609382" defer></script>
-  <script src="config.js?v=1792609382" defer></script>
-  <script src="app.js?v=1792609382" defer></script>
+  <p>Сайт переехал: <a href="https://kritskayabeauty.github.io/">kritskayabeauty.github.io</a></p>
 </body>
 </html>
